@@ -1,0 +1,192 @@
+Create a premium 2026 landing page for Dorian Apps, an AI-native software studio at dorianapps.com.
+
+Dorian Apps builds practical AI-powered business software: internal apps, dashboards, automation systems, document tools, workflow platforms, and intelligent agent-based systems for real companies. The brand should feel serious, sharp, technical, trustworthy, and useful. It should not feel like a generic AI startup, design agency, SaaS template, or childish app company.
+
+Overall direction:
+Create a modern company marketing website for an AI-native software and automation studio. The site should communicate that Dorian Apps builds custom software systems that help businesses operate faster, reduce manual work, organize information, automate repetitive processes, and turn scattered workflows into clean digital systems.
+
+Visual style:
+Use a dark premium tech aesthetic with graphite black, deep navy, charcoal, soft silver, off-white text, and one controlled electric blue accent. The design should feel engineered, precise, mature, and high-end. Use clean geometric layouts, modular grid systems, glassy panels, thin technical lines, subtle gradients, and refined shadows. Avoid cheap neon, cartoon AI visuals, robot heads, brain icons, chat bubbles, random floating 3D shapes, stock startup illustrations, and generic SaaS cards.
+
+Brand identity:
+Use the name Dorian Apps clearly in the header and hero. Use a strong abstract DA monogram or modular symbol as the logo mark. The symbol should suggest software modules, connected systems, automation, infrastructure, and intelligent workflows without using obvious AI clichés.
+
+Homepage structure:
+
+1. Header
+   Create a minimal sticky header with the Dorian Apps logo on the left and navigation links on the right:
+   Work
+   Services
+   Process
+   About
+   Contact
+
+Add a small primary button:
+Build with us
+
+The header should be clean, glassy, and slightly transparent when scrolling.
+
+2. Hero section
+   Create a full-screen hero section with a premium dark background. Use an abstract visual system in the background: connected software modules, floating interface fragments, data lines, automation flows, and subtle agent-node patterns. It should feel like digital infrastructure, not sci-fi decoration.
+
+Hero headline:
+Practical AI apps for real business workflows.
+
+Hero subheadline:
+Dorian Apps designs and builds custom software, dashboards, automations, document systems, and intelligent agent workflows that turn messy operations into clean digital products.
+
+Primary button:
+Start a project
+
+Secondary button:
+See what we build
+
+Add three small trust/value points below the buttons:
+Custom business apps
+AI automation systems
+Dashboards and document tools
+
+Animate the hero with slow parallax movement, subtle glowing connection lines, text reveal on load, and smooth button hover effects. Keep motion elegant, not noisy.
+
+3. Problem section
+   Create a section with a strong editorial headline:
+   Most businesses do not need more software. They need the right system.
+
+Add short copy explaining:
+Teams lose time moving data between tools, chasing documents, repeating manual tasks, managing spreadsheets, and relying on broken workflows. Dorian Apps builds practical digital systems that remove friction and make operations easier to run.
+
+Use a split layout with text on one side and a visual “messy workflow becomes clean system” diagram on the other side. Animate the diagram as scattered blocks connecting into one clean modular interface.
+
+4. Services section
+   Create four large premium service cards. Each card should be clean, dark, modular, and interactive with subtle hover animation.
+
+Service 1:
+Business Apps
+Custom internal tools, portals, admin panels, booking systems, trackers, and operational platforms.
+
+Service 2:
+Dashboards
+Live dashboards for business metrics, workers, documents, projects, clients, finances, and operations.
+
+Service 3:
+Automation Systems
+Workflow automation, AI-assisted processes, integrations, notifications, document routing, and repetitive task removal.
+
+Service 4:
+AI Agent Workflows
+Agent-based systems for research, document handling, support, internal operations, and decision support.
+
+Each card should have a small technical icon, number label, short description, and micro-animation on hover. Icons should be abstract and geometric, not generic.
+
+5. Featured systems section
+   Create a section called:
+   Systems we build
+
+Show three cinematic case-study style blocks, even if they are concept examples.
+
+Example 1:
+Construction Operations Tracker
+A system for managing workers, vehicles, work sessions, GPS location history, payroll exports, and admin dashboards.
+
+Example 2:
+Document Intelligence Platform
+A document vault for uploading, organizing, analyzing, summarizing, and searching personal or business documents with AI.
+
+Example 3:
+AI Business Dashboard
+A control center for monitoring operations, automations, tasks, system status, and agent workflows.
+
+Each project block should feel like a premium product preview with dashboard mockups, dark UI screens, clean data cards, mobile and desktop views, and subtle motion. Do not make the UI look fake or overloaded.
+
+6. Process section
+   Create a simple, confident process section with five steps:
+   01 Understand the workflow
+   02 Design the system
+   03 Build the product
+   04 Automate the boring parts
+   05 Launch, improve, and scale
+
+Use horizontal timeline design on desktop and vertical stacked design on mobile. Add subtle scroll reveal animations.
+
+7. Why Dorian Apps section
+   Create a section with the headline:
+   Built for operators, not hype.
+
+Explain that Dorian Apps focuses on practical software that works in the real world. The tone should be grounded and direct. Mention that the studio builds systems for business owners, teams, and organizations who need better tools, not buzzwords.
+
+Use value statements:
+Useful before flashy
+Fast without being fragile
+AI where it actually helps
+Clean systems over messy workarounds
+Built to be maintained and improved
+
+8. Technology section
+   Create a subtle technical credibility section. Do not make it too developer-heavy. Mention modern web apps, databases, authentication, dashboards, APIs, automation, AI models, document processing, cloud deployment, and agent workflows.
+
+Style it as a clean technical stack grid with minimal labels and thin lines.
+
+9. Final CTA section
+   Create a strong final call-to-action with the headline:
+   Have a workflow that feels broken?
+
+Subheadline:
+Dorian Apps can turn it into a clean, usable, AI-powered system.
+
+Buttons:
+Start a project
+Email Dorian Apps
+
+10. Footer
+    Create a minimal footer with:
+    Dorian Apps
+    AI-native software studio
+    dorianapps.com
+    Contact
+    Services
+    Work
+    Privacy
+
+Responsive behavior:
+The site must be fully responsive. On desktop, use cinematic wide layouts, large typography, premium spacing, and scroll-based reveals. On mobile, simplify the layout, stack cards vertically, keep text readable, keep navigation clean, and make buttons easy to tap.
+
+Animation requirements:
+Use smooth page load animation, text reveal, subtle parallax background movement, hover states on cards, magnetic button feel, scroll-triggered section reveals, animated connection lines, and soft transitions between sections. Motion should feel expensive and controlled, not chaotic.
+
+Tone:
+Confident, practical, technical, premium, and direct. Avoid hype phrases like “revolutionary,” “game-changing,” “unlock the future,” and “powered by magic.” The brand should feel like it builds real tools for real businesses.
+
+Negative instructions:
+Do not create a generic SaaS landing page.
+Do not use robot icons, brain icons, chat bubbles, crypto visuals, childish illustrations, random glowing orbs, generic startup people illustrations, fake overcomplicated dashboards, excessive neon, or template-looking pricing sections.
+Do not make it look like a marketing agency.
+Do not make it look like a mobile app landing page.
+Do not make it playful.
+Do not make it corporate-boring.
+Make it sharp, useful, premium, and memorable.
+Navigation requirements:
+
+Create a clear, premium navigation system that works on desktop and mobile.
+
+Desktop navigation:
+Use a sticky glass-style header that stays visible while scrolling. The header should include the Dorian Apps logo on the left, navigation links in the center or right, and a strong CTA button on the far right.
+
+Navigation links:
+Home
+Services
+Systems
+Process
+About
+Contact
+
+Each navigation item should smoothly scroll to the correct section on the homepage. Add subtle active states while scrolling so the user knows which section they are viewing. Hover states should be refined and minimal, using thin underline animations or electric blue accent details.
+
+Mobile navigation:
+Create a clean mobile menu with a hamburger icon in the top-right corner. When opened, it should show a full-screen or slide-in dark menu with large readable links, the Dorian Apps logo, and a clear “Start a project” CTA. The mobile menu should have smooth open and close animations, visible close button, proper spacing, and no overlapping text.
+
+Navigation behavior:
+The header should become slightly more compact after scrolling. The background should shift from transparent to dark glass with blur. All buttons and links should be keyboard accessible, easy to tap on mobile, and visually clear. Avoid cluttered dropdowns unless absolutely necessary.
+
+Important:
+Do not create fake links that go nowhere. If this is a one-page landing site, all nav items should anchor-scroll to the correct sections. If creating separate pages, make sure every nav item has a real page layout.
+
