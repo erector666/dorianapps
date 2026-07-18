@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactiveVideoHero } from "@/components/ReactiveVideoHero";
+import { VideoHero } from "@/components/VideoHero";
 import { HomeHero } from "@/components/HomeHero";
 import { HomeOrigin } from "@/components/HomeOrigin";
 import { HomeProducts } from "@/components/HomeProducts";
@@ -11,7 +11,7 @@ import { HomeClose } from "@/components/HomeClose";
 export function HomeExperience() {
   return (
     <main id="main-content" className="flow-shell">
-      <ReactiveVideoHero
+      <VideoHero
         src="/videos/workshop_video_silent.mp4"
         poster="/assets/workshop_still.jpg"
       />

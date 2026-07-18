@@ -433,8 +433,8 @@ canvas {
 .flow-telemetry span:last-child::before{background:var(--flow-red);box-shadow:0 0 10px var(--flow-red)}
 .flow-scroll-cue{position:absolute;left:0;bottom:3rem;margin:0;color:rgba(255,255,255,.34);font:600 .54rem var(--font-mono);letter-spacing:.16em}
 
-/* ── ReactiveVideoHero ─────────────────────────────────────────────── */
-.reactive-video-hero {
+/* ── VideoHero ────────────────────────────────────────────────── */
+.video-hero {
   position: absolute;
   inset: 0;
   height: 100vh;
@@ -444,13 +444,13 @@ canvas {
   background: #020408;
 }
 
-.reactive-video-layer {
+.video-hero-layer {
   position: absolute;
   inset: -10%;
   will-change: transform;
 }
 
-.reactive-video-media {
+.video-hero-media {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -460,7 +460,7 @@ canvas {
   filter: saturate(0.85);
 }
 
-.reactive-video-poster {
+.video-hero-poster {
   position: absolute;
   inset: 0;
   background-size: cover;
@@ -470,7 +470,7 @@ canvas {
   filter: saturate(0.75) brightness(0.7);
 }
 
-.reactive-video-overlay {
+.video-hero-overlay {
   position: absolute;
   inset: 0;
   background:
@@ -479,82 +479,21 @@ canvas {
     linear-gradient(90deg, rgba(2,4,8,.94), rgba(2,4,8,.52) 55%, rgba(2,4,8,.28));
 }
 
-/* Floating decor container */
-.reactive-decor-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-
-/* Code fragments — translucent monospace lines */
-.hero-decor-code {
-  position: absolute;
-  color: rgba(136, 180, 255, 0.38);
-  font-family: var(--font-mono);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  text-shadow: 0 0 12px rgba(57, 136, 255, 0.25);
-  will-change: transform, opacity;
-}
-
-/* AI nodes — small glowing dots */
-.hero-decor-node {
-  position: absolute;
-  border-radius: 50%;
-  will-change: transform, opacity;
-}
-
-/* Transparent UI panel outlines */
-.hero-decor-panel {
-  position: absolute;
-  border: 1px solid rgba(136, 180, 255, 0.16);
-  border-radius: 10px;
-  background: rgba(57, 136, 255, 0.03);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-  backdrop-filter: blur(1px);
-  will-change: transform, opacity;
-}
-
-/* ── Mobile poster override ──────────────────────────────────────── */
+/* ── Mobile poster override ──────────────────────────────────── */
 @media (max-width: 767px) {
-  .reactive-video-media {
-    display: none;
-  }
-  .reactive-video-poster {
-    opacity: 0.72;
-    filter: saturate(0.82) brightness(0.65);
-  }
-  .reactive-decor-layer {
-    display: none;
-  }
+  .video-hero-media { display: none; }
+  .video-hero-poster { opacity: 0.72; filter: saturate(0.82) brightness(0.65); }
 }
 
-/* ── Reduced-motion override ─────────────────────────────────────── */
+/* ── Reduced-motion override ─────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .reactive-video-layer {
-    will-change: auto;
-    transform: none !important;
-  }
-  .reactive-video-media {
-    display: none;
-  }
-  .reactive-video-poster {
-    opacity: 0.72;
-  }
-  .reactive-decor-layer {
-    display: none;
-  }
-  .hero-decor-code,
-  .hero-decor-node,
-  .hero-decor-panel {
-    animation: none !important;
-    transition: none !important;
-  }
+  .video-hero-layer { will-change: auto; transform: none !important; }
+  .video-hero-media { display: none; }
+  .video-hero-poster { opacity: 0.72; }
 }
 
-.flow-hero{min-height:100vh;display:grid;align-items:center;position:relative;z-index:2}.flow-origin { min-height:110svh; display:grid; align-items:center; position:relative; background:linear-gradient(90deg,rgba(2,4,8,.97) 0%,rgba(2,4,8,.83) 56%,rgba(2,4,8,.15) 100%); border-top:1px solid rgba(255,255,255,.08); }
+.flow-hero{min-height:100vh;display:grid;align-items:center;position:relative;z-index:2}
+.flow-origin { min-height:110svh; display:grid; align-items:center; position:relative; background:linear-gradient(90deg,rgba(2,4,8,.97) 0%,rgba(2,4,8,.83) 56%,rgba(2,4,8,.15) 100%); border-top:1px solid rgba(255,255,255,.08); }
 .flow-origin-layout{display:grid;grid-template-columns:.25fr 1fr;gap:3rem;align-items:start}.flow-origin-number{font:500 clamp(7rem,15vw,15rem)/.75 var(--font-display);color:rgba(255,255,255,.045);letter-spacing:-.08em}.flow-origin-copy{max-width:65rem}.flow-origin h2{font-size:clamp(3.4rem,6.4vw,7.6rem);line-height:.9;max-width:14ch}.flow-origin-copy>p:not(.flow-kicker){max-width:42rem;margin:2rem 0 0;color:rgba(255,255,255,.65);font-size:1.08rem;line-height:1.7}.flow-origin-copy>p:last-child{color:#fff}
 
 .flow-products{position:relative;padding:11rem 0 0;background:linear-gradient(180deg,rgba(2,4,8,.98),rgba(2,4,8,.77) 16%,rgba(2,4,8,.86) 86%,#020408)}
