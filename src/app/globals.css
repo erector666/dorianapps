@@ -435,8 +435,9 @@ canvas {
 
 /* ── ReactiveVideoHero ─────────────────────────────────────────────── */
 .reactive-video-hero {
-  position: fixed;
+  position: absolute;
   inset: 0;
+  height: 100vh;
   z-index: 1;
   overflow: hidden;
   pointer-events: none;
@@ -553,7 +554,7 @@ canvas {
   }
 }
 
-.flow-origin { min-height:110svh; display:grid; align-items:center; position:relative; background:linear-gradient(90deg,rgba(2,4,8,.97) 0%,rgba(2,4,8,.83) 56%,rgba(2,4,8,.15) 100%); border-top:1px solid rgba(255,255,255,.08); }
+.flow-hero{min-height:100vh;display:grid;align-items:center;position:relative;z-index:2}.flow-origin { min-height:110svh; display:grid; align-items:center; position:relative; background:linear-gradient(90deg,rgba(2,4,8,.97) 0%,rgba(2,4,8,.83) 56%,rgba(2,4,8,.15) 100%); border-top:1px solid rgba(255,255,255,.08); }
 .flow-origin-layout{display:grid;grid-template-columns:.25fr 1fr;gap:3rem;align-items:start}.flow-origin-number{font:500 clamp(7rem,15vw,15rem)/.75 var(--font-display);color:rgba(255,255,255,.045);letter-spacing:-.08em}.flow-origin-copy{max-width:65rem}.flow-origin h2{font-size:clamp(3.4rem,6.4vw,7.6rem);line-height:.9;max-width:14ch}.flow-origin-copy>p:not(.flow-kicker){max-width:42rem;margin:2rem 0 0;color:rgba(255,255,255,.65);font-size:1.08rem;line-height:1.7}.flow-origin-copy>p:last-child{color:#fff}
 
 .flow-products{position:relative;padding:11rem 0 0;background:linear-gradient(180deg,rgba(2,4,8,.98),rgba(2,4,8,.77) 16%,rgba(2,4,8,.86) 86%,#020408)}
