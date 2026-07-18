@@ -1,7 +1,7 @@
 "use client";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { NeuralCoreScene } from "@/components/NeuralCoreScene";
+import { NeuralCoreR3F } from "@/components/NeuralCoreR3F";
 import { HomeHero } from "@/components/HomeHero";
 import { HomeOrigin } from "@/components/HomeOrigin";
 import { HomeProducts } from "@/components/HomeProducts";
@@ -13,7 +13,7 @@ export function HomeExperience() {
   return (
     <main id="main-content" className="flow-shell">
       <ErrorBoundary>
-        <NeuralCoreScene />
+        <NeuralCoreR3F />
       </ErrorBoundary>
       <HomeHero />
       <HomeOrigin />
