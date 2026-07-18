@@ -347,6 +347,45 @@ canvas {
 .neural-core-scan { position:absolute; inset:0; z-index:4; opacity:.055; background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(122,170,255,.28) 4px); mask-image:linear-gradient(90deg,transparent 32%,black 78%,transparent); animation:flow-scan 9s linear infinite; }
 @keyframes flow-scan { 50% { transform: translateY(16px); opacity:.13; } }
 
+/* VideoBackground – cinematic hero video */
+.video-background {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+  background: #020408;
+}
+
+.video-background-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.72;
+  filter: saturate(0.85);
+}
+
+.video-background-poster {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.65;
+  filter: saturate(0.75) brightness(0.7);
+}
+
+.video-background-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(0deg, #020408 0%, rgba(2, 4, 8, 0.55) 38%, rgba(2, 4, 8, 0.18) 100%),
+    radial-gradient(circle at 70% 40%, rgba(45, 140, 255, 0.12), transparent 55%),
+    linear-gradient(90deg, rgba(2, 4, 8, 0.92), rgba(2, 4, 8, 0.45) 55%, rgba(2, 4, 8, 0.22));
+}
+
 .flow-kicker {
   margin: 0;
   color: #8ab7ff;

@@ -2,6 +2,7 @@
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { NeuralCoreScene } from "@/components/NeuralCoreScene";
+import { VideoBackground } from "@/components/VideoBackground";
 import { HomeHero } from "@/components/HomeHero";
 import { HomeOrigin } from "@/components/HomeOrigin";
 import { HomeProducts } from "@/components/HomeProducts";
@@ -33,6 +34,10 @@ export function HomeExperience() {
       <ErrorBoundary fallback={<NeuralCoreFallback />}>
         <NeuralCoreScene />
       </ErrorBoundary>
+      <VideoBackground
+        src="/videos/workshop_video_silent.mp4"
+        poster="/assets/workshop_still.jpg"
+      />
       <HomeHero />
       <HomeOrigin />
       <HomeProducts />
