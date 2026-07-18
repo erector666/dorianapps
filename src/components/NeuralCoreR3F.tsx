@@ -169,6 +169,7 @@ export function NeuralCoreR3F() {
   const [mobileDevice, setMobileDevice] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [tabHidden, setTabHidden] = useState(false);
+  const [webGLAvailable, setWebGLAvailable] = useState(true);
 
   useEffect(() => {
     setReducedMotion(prefersReducedMotion());
@@ -178,6 +179,20 @@ export function NeuralCoreR3F() {
     /* Pause WebGL render loop when tab is hidden */
     const onVisibility = () => setTabHidden(document.hidden);
     document.addEventListener("visibilitychange", onVisibility);
+
+    /* Probe WebGL availability so we can fall back to CSS gradient
+     * when no GPU / software rendering is in use (llvmpipe, etc.). */
+    try {
+      const probe = document.createElement("canvas");
+      const gl =
+        probe.getContext("webgl2") ||
+        probe.getContext("webgl") ||
+        probe.getContext("experimental-webgl");
+      if (!gl) setWebGLAvailable(false);
+    } catch {
+      setWebGLAvailable(false);
+    }
+
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, []);
 
@@ -197,8 +212,8 @@ export function NeuralCoreR3F() {
     );
   }
 
-  /* Reduced motion → static radial gradient, zero WebGL. */
-  if (reducedMotion) {
+  /* Reduced motion or no WebGL → static radial gradient, zero WebGL. */
+  if (reducedMotion || !webGLAvailable) {
     return <ReducedMotionFallback />;
   }
 

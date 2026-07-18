@@ -307,6 +307,7 @@ export function ProductScreenPortal(props: ProductScreenPortalProps) {
   const { imageSrc, accentColor, productIndex, alt } = props;
   const [mobileDevice, setMobileDevice] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [webglSupported, setWebglSupported] = useState(true);
   const [inView, setInView] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -315,13 +316,22 @@ export function ProductScreenPortal(props: ProductScreenPortalProps) {
   useEffect(() => {
     setMobileDevice(isMobile());
     setReducedMotion(prefersReducedMotion());
+    try {
+      const canvas = document.createElement("canvas");
+      const gl =
+        canvas.getContext("webgl") ||
+        canvas.getContext("experimental-webgl");
+      setWebglSupported(!!gl);
+    } catch {
+      setWebglSupported(false);
+    }
     setHydrated(true);
   }, []);
 
   /* IntersectionObserver: mount canvas only when near viewport */
   useEffect(() => {
     const el = containerRef.current;
-    if (!el || mobileDevice || reducedMotion) return;
+    if (!el || mobileDevice || reducedMotion || !webglSupported) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -332,7 +342,7 @@ export function ProductScreenPortal(props: ProductScreenPortalProps) {
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [mobileDevice, reducedMotion]);
+  }, [mobileDevice, reducedMotion, webglSupported]);
 
   /* Before hydration: reserve space to prevent layout shift */
   if (!hydrated) {
@@ -348,7 +358,7 @@ export function ProductScreenPortal(props: ProductScreenPortalProps) {
   const num = String(productIndex + 1).padStart(2, "0");
 
   /* Mobile or reduced motion → CSS-only fallback */
-  if (mobileDevice || reducedMotion) {
+  if (mobileDevice || reducedMotion || !webglSupported) {
     return <CSSFallback {...props} />;
   }
 
