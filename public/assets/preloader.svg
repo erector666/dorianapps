@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <defs>
+    <filter id="loader-glow">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+
+  <!-- Animated drawing circle -->
+  <circle cx="40" cy="40" r="32" fill="none" stroke="#2D8CFF" stroke-width="1.8" stroke-linecap="round"
+    stroke-dasharray="200" stroke-dashoffset="200"
+    opacity="0.8" filter="url(#loader-glow)">
+    <animate attributeName="stroke-dashoffset" from="200" to="-200" dur="2s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1"/>
+  </circle>
+
+  <!-- Accent dot following the line -->
+  <circle cx="40" cy="8" r="2.5" fill="#2D8CFF" filter="url(#loader-glow)">
+    <animateTransform attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="2s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1"/>
+  </circle>
+
+  <!-- Center dot -->
+  <circle cx="40" cy="40" r="2" fill="rgba(255,255,255,0.4)">
+    <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>

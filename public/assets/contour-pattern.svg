@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <filter id="green-glow">
+      <feGaussianBlur stdDeviation="0.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Tileable contour lines - irregular concentric shapes -->
+  <!-- Outermost contour -->
+  <path d="M 0 180 C 60 160, 120 200, 200 170 C 280 140, 340 190, 400 175" fill="none" stroke="#10B981" stroke-width="0.5" stroke-opacity="0.02" filter="url(#green-glow)"/>
+
+  <path d="M 0 200 C 50 175, 100 230, 200 195 C 300 160, 350 220, 400 205" fill="none" stroke="#10B981" stroke-width="0.6" stroke-opacity="0.025"/>
+
+  <path d="M 0 220 C 70 195, 140 250, 220 215 C 310 180, 350 240, 400 230" fill="none" stroke="#10B981" stroke-width="0.5" stroke-opacity="0.02"/>
+
+  <path d="M 0 245 C 80 210, 150 280, 230 240 C 320 200, 360 260, 400 250" fill="none" stroke="#10B981" stroke-width="0.7" stroke-opacity="0.025"/>
+
+  <path d="M 0 270 C 60 240, 130 310, 240 265 C 310 230, 350 280, 400 275" fill="none" stroke="#10B981" stroke-width="0.5" stroke-opacity="0.02"/>
+
+  <!-- Inner contour details -->
+  <path d="M 0 300 C 90 270, 160 340, 250 290 C 330 250, 360 310, 400 300" fill="none" stroke="#10B981" stroke-width="0.6" stroke-opacity="0.02"/>
+
+  <path d="M 0 330 C 70 300, 140 370, 260 320 C 340 280, 370 340, 400 335" fill="none" stroke="#10B981" stroke-width="0.5" stroke-opacity="0.018"/>
+
+  <path d="M 0 360 C 100 330, 180 390, 270 350 C 350 320, 380 370, 400 365" fill="none" stroke="#10B981" stroke-width="0.6" stroke-opacity="0.02"/>
+
+  <path d="M 0 395 C 80 370, 200 400, 300 380 C 350 370, 380 395, 400 400" fill="none" stroke="#10B981" stroke-width="0.5" stroke-opacity="0.015"/>
+
+  <!-- Additional irregular wave contours -->
+  <path d="M -5 50 C 30 30, 70 70, 120 45 C 170 20, 220 65, 270 50 C 320 35, 360 60, 405 48" fill="none" stroke="#10B981" stroke-width="0.4" stroke-opacity="0.018"/>
+
+  <path d="M -5 80 C 40 55, 90 100, 140 75 C 190 50, 240 95, 290 70 C 340 55, 370 80, 405 72" fill="none" stroke="#10B981" stroke-width="0.5" stroke-opacity="0.02"/>
+
+  <path d="M -5 110 C 50 85, 100 130, 160 105 C 210 80, 260 125, 310 100 C 350 85, 380 110, 405 105" fill="none" stroke="#10B981" stroke-width="0.4" stroke-opacity="0.015"/>
+
+  <path d="M -5 140 C 60 115, 110 160, 170 135 C 230 110, 280 155, 330 130 C 360 115, 385 140, 405 138" fill="none" stroke="#10B981" stroke-width="0.6" stroke-opacity="0.022"/>
+
+  <!-- Depth marker dots -->
+  <circle cx="50" cy="215" r="1.5" fill="#10B981" opacity="0.08"/>
+  <circle cx="160" cy="255" r="1.5" fill="#10B981" opacity="0.08"/>
+  <circle cx="280" cy="200" r="1.5" fill="#10B981" opacity="0.08"/>
+  <circle cx="380" cy="280" r="1.5" fill="#10B981" opacity="0.08"/>
+  <circle cx="100" cy="340" r="1.5" fill="#10B981" opacity="0.08"/>
+  <circle cx="250" cy="370" r="1.5" fill="#10B981" opacity="0.08"/>
+  <circle cx="340" cy="130" r="1.5" fill="#10B981" opacity="0.08"/>
+</svg>

@@ -1,0 +1,44 @@
+{
+  "name": "dorian-apps-site",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "test": "npm run test:smoke && npm run test:animation",
+    "test:smoke": "node tests/smoke.mjs",
+    "test:animation": "node tests/animation-system.mjs",
+    "lighthouse": "lighthouse http://127.0.0.1:3000 --preset=desktop --only-categories=performance --output=json --output-path=output/lighthouse.json"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^9.6.1",
+    "@studio-freight/lenis": "^1.0.42",
+    "framer-motion": "^12.42.2",
+    "gsap": "^3.15.0",
+    "next": "^16.2.9",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "split-type": "^0.3.4",
+    "three": "^0.185.0"
+  },
+  "devDependencies": {
+    "@types/gsap": "^1.20.2",
+    "@types/node": "^26.0.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.185.0",
+    "autoprefixer": "^10.5.2",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.9",
+    "html-validate": "^10.5.0",
+    "lighthouse": "^13.4.0",
+    "playwright": "^1.61.1",
+    "postcss": "^8.5.16",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^6.0.3"
+  }
+}
