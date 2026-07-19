@@ -56,9 +56,13 @@ export function ScrollReactiveHero() {
 
     let ticking = false;
     const update = () => {
-      const rect = section.getBoundingClientRect();
-      const total = rect.height - window.innerHeight;
-      setProgress(total > 0 ? clamp01(-rect.top / total) : 0);
+      try {
+        const rect = section.getBoundingClientRect();
+        const total = rect.height - window.innerHeight;
+        setProgress(total > 0 ? clamp01(-rect.top / total) : 0);
+      } catch (e) {
+        // Silently handle — scroll will be retried on next frame
+      }
       ticking = false;
     };
     const onScroll = () => {
@@ -67,15 +71,16 @@ export function ScrollReactiveHero() {
         requestAnimationFrame(update);
       }
     };
+    // Use both window and document scroll for broader compatibility
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    document.addEventListener("scroll", onScroll, { passive: true });
     update();
+
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      document.removeEventListener("scroll", onScroll);
     };
-  }, [reducedMotion]);
-
+  }, [reducedMotion, sectionRef]);
   // Which stage is active and how far we are inside it (0..1)
   const stageCount = STAGES.length;
   const scaled = progress * stageCount;
