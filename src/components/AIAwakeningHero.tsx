@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
 import Image from "next/image"
 
 const STAGES = [
@@ -11,6 +12,7 @@ const STAGES = [
     lede: "The slumber before ignition. Emergency lights from below. The AI waits.",
     tag: "01 / SLUMBER",
     image: "stage-1.png",
+    telemetry: "CORE / OFFLINE",
   },
   {
     kicker: "Something stirs in the dark.",
@@ -19,6 +21,7 @@ const STAGES = [
     lede: "The first sign of life. A single crimson ember in the left eye socket. Circuits begin to hum.",
     tag: "02 / FLICKER",
     image: "stage-2.png",
+    telemetry: "OPTICS / INITIALIZING",
   },
   {
     kicker: "Both eyes ignite.",
@@ -27,6 +30,7 @@ const STAGES = [
     lede: "Neural patterns spread across the faceplate like glowing veins. The machine sees for the first time.",
     tag: "03 / IGNITION",
     image: "stage-3.png",
+    telemetry: "NEURAL / IGNITING",
   },
   {
     kicker: "Connected to everything.",
@@ -35,20 +39,25 @@ const STAGES = [
     lede: "The AI stands tall. Red neural threads reach across the void — connecting, thinking, becoming.",
     tag: "04 / NETWORK",
     image: "stage-4.png",
+    telemetry: "NETWORK / CONNECTED",
   },
 ]
 
+const spring = { type: "spring" as const, stiffness: 300, damping: 30 }
+const exitSpring = { type: "spring" as const, stiffness: 200, damping: 25 }
+
 export function AIAwakeningHero() {
   const sectionRef = useRef<HTMLElement>(null)
+  const [stage, setStage] = useState(0)
   const [progress, setProgress] = useState(0)
   const [reducedMotion, setReducedMotion] = useState(false)
 
   useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)")
-    setReducedMotion(query.matches)
-    const onChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
-    query.addEventListener("change", onChange)
-    return () => query.removeEventListener("change", onChange)
+    const q = window.matchMedia("(prefers-reduced-motion: reduce)")
+    setReducedMotion(q.matches)
+    const h = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
+    q.addEventListener("change", h)
+    return () => q.removeEventListener("change", h)
   }, [])
 
   useEffect(() => {
@@ -58,13 +67,12 @@ export function AIAwakeningHero() {
 
     let ticking = false
     const update = () => {
-      try {
-        const rect = section.getBoundingClientRect()
-        const total = rect.height - window.innerHeight
-        setProgress(total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0)
-      } catch {
-        // silent
-      }
+      const rect = section.getBoundingClientRect()
+      const total = rect.height - window.innerHeight
+      const p = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0
+      setProgress(p)
+      const s = Math.min(STAGES.length - 1, Math.floor(p * STAGES.length))
+      setStage(s)
       ticking = false
     }
     const onScroll = () => {
@@ -82,107 +90,133 @@ export function AIAwakeningHero() {
     }
   }, [reducedMotion])
 
-  const stageCount = STAGES.length
-  const scaled = progress * stageCount
-  const activeIndex = Math.min(stageCount - 1, Math.floor(scaled))
-  const local = scaled - activeIndex
+  const current = STAGES[stage]
+  const prevStage = stage > 0 ? STAGES[stage - 1] : null
+  const nextStage = stage < STAGES.length - 1 ? STAGES[stage + 1] : null
 
   return (
-    <section ref={sectionRef} className="rx-hero ai-awakening" data-stage={activeIndex}>
+    <section ref={sectionRef} className="rx-hero ai-awakening">
       <div className="rx-hero-sticky">
-        {/* Scene layers - one per stage */}
+        {/* Image layer with AnimatePresence */}
         <div className="rx-hero-scenes" aria-hidden="true">
-          {STAGES.map((stage, i) => {
-            const d = scaled - i
-            let opacity: number
-            if (reducedMotion) {
-              opacity = i === 0 ? 1 : 0
-            } else if (d < -0.35) opacity = 0
-            else if (d < 0) opacity = (d + 0.35) / 0.35
-            else if (d <= 1) opacity = 1
-            else if (d < 1.35) opacity = 1 - (d - 1) / 0.35
-            else opacity = 0
+          <AnimatePresence mode="popLayout">
+            <motion.div
+              key={current.image}
+              className="rx-hero-scene"
+              initial={{ opacity: 0, scale: 1.06 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96, filter: "blur(4px)" }}
+              transition={reducedMotion ? { duration: 0 } : spring}
+              style={{ position: "absolute", inset: 0 }}
+            >
+              <Image
+                src={`/assets/ai-awakening/${current.image}`}
+                alt=""
+                fill
+                priority
+                sizes="100vw"
+                className="rx-hero-img"
+              />
+            </motion.div>
+          </AnimatePresence>
 
-            const scale = reducedMotion ? 1 : 1.14 - Math.min(1, Math.max(0, (d + 0.35) / 1.7)) * 0.14
-            const y = reducedMotion ? 0 : d * -4
-
-            return (
-              <div
-                key={stage.tag}
-                className="rx-hero-scene"
-                style={{
-                  opacity,
-                  transform: `scale(${scale.toFixed(4)}) translate3d(0, ${y.toFixed(2)}vh, 0)`,
-                  visibility: opacity <= 0.001 ? "hidden" : "visible",
-                }}
-              >
-                <Image
-                  src={`/assets/ai-awakening/${stage.image || "stage-1.png"}`}
-                  alt=""
-                  fill
-                  priority={i === 0}
-                  sizes="100vw"
-                  className="rx-hero-img"
-                  style={{ filter: i === 1 || i === 2 ? "saturate(1.1)" : "none" }}
-                />
-              </div>
-            )
-          })}
-          <div className="rx-hero-overlay" style={{ background: "linear-gradient(180deg, rgba(180,0,0,0.15) 0%, rgba(0,0,0,0.6) 100%)" }} />
+          {/* Overlay gradient */}
+          <div
+            className="rx-hero-overlay"
+            style={{
+              background: "linear-gradient(180deg, rgba(180,0,0,0.12) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8) 100%)",
+            }}
+          />
           <div className="rx-hero-grain" />
         </div>
 
-        {/* HUD: stage rail */}
+        {/* Stage rail */}
         <div className="rx-hero-rail" aria-hidden="true">
-          {STAGES.map((stage, i) => (
-            <div key={stage.tag} className={`rx-rail-item${i === activeIndex ? " is-active" : ""}${i >= activeIndex ? "" : " is-passed"}`}>
-              <i />
-              <span>{stage.tag}</span>
+          {STAGES.map((s, i) => (
+            <div
+              key={s.tag}
+              className={`rx-rail-item${i === stage ? " is-active" : ""}${i < stage ? " is-passed" : ""}`}
+            >
+              <motion.i
+                animate={i === stage ? { scale: [1, 1.4, 1], transition: { repeat: Infinity, duration: 2 } } : { scale: 1 }}
+              />
+              <span>{s.tag}</span>
             </div>
           ))}
         </div>
 
-        {/* Copy */}
+        {/* Copy with AnimatePresence */}
         <div className="flow-container rx-hero-content">
           <div className="rx-hero-copy">
-            {STAGES.map((stage, i) => {
-              const isActive = i === activeIndex
-              const exit = isActive && !reducedMotion ? Math.min(1, Math.max(0, (local - 0.72) / 0.28)) : 0
-              return (
-                <div
-                  key={stage.tag}
-                  className="rx-hero-copy-stage"
-                  style={{
-                    opacity: isActive ? 1 - exit : 0,
-                    transform: `translateY(${isActive ? exit * -28 : 24}px)`,
-                    pointerEvents: isActive ? "auto" : "none",
-                  }}
-                  aria-hidden={!isActive}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={current.tag}
+                className="rx-hero-copy-stage"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={reducedMotion ? { duration: 0 } : { type: "spring" as const, stiffness: 400, damping: 35 }}
+              >
+                <motion.p
+                  className="flow-kicker"
+                  style={{ color: "#ff4444" }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1, ...spring }}
                 >
-                  <p className="flow-kicker" style={{ color: "#ff4444" }}>{stage.kicker}</p>
-                  <h1 className="rx-hero-title">
-                    {stage.titleA}
-                    <br />
-                    <em style={{ color: "#ff2222", textShadow: "0 0 20px rgba(255,0,0,0.5)" }}>{stage.titleB}</em>
-                  </h1>
-                  <p className="rx-hero-lede">{stage.lede}</p>
-                </div>
-              )
-            })}
+                  {current.kicker}
+                </motion.p>
+                <h1 className="rx-hero-title">
+                  {current.titleA}
+                  <br />
+                  <motion.em
+                    style={{ color: "#ff2222", textShadow: "0 0 20px rgba(255,0,0,0.5)" }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.15, ...spring }}
+                  >
+                    {current.titleB}
+                  </motion.em>
+                </h1>
+                <motion.p
+                  className="rx-hero-lede"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, ...spring }}
+                >
+                  {current.lede}
+                </motion.p>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Telemetry */}
           <div className="flow-telemetry rx-hero-telemetry" aria-hidden="true">
-            <span style={{ color: activeIndex >= 0 ? "#ff4444" : "#666" }}>CORE / {activeIndex >= 0 ? "BOOTING" : "OFFLINE"}</span>
-            <span style={{ color: activeIndex >= 1 ? "#ff4444" : "#666" }}>OPTICS / {activeIndex >= 1 ? "ACTIVE" : "STANDBY"}</span>
-            <span style={{ color: activeIndex >= 2 ? "#ff4444" : "#666" }}>NEURAL / {activeIndex >= 3 ? "CONNECTED" : activeIndex >= 2 ? "IGNITING" : "DORMANT"}</span>
+            {STAGES.map((s, i) => (
+              <motion.span
+                key={s.telemetry}
+                animate={{
+                  color: i <= stage ? "#ff4444" : "#444",
+                  opacity: i <= stage ? 1 : 0.3,
+                }}
+                transition={{ duration: 0.3 }}
+              >
+                {s.telemetry}
+              </motion.span>
+            ))}
           </div>
 
-          {/* Progress */}
+          {/* Progress bar */}
           <div className="rx-hero-cue" aria-hidden="true">
-            <p className="flow-scroll-cue rx-hero-cue-label" style={{ color: "#ff4444" }}>SCROLL / AI AWAKENING SEQUENCE</p>
+            <p className="flow-scroll-cue rx-hero-cue-label" style={{ color: "#ff4444" }}>
+              SCROLL / {current.tag}
+            </p>
             <div className="rx-hero-progress">
-              <i style={{ background: "linear-gradient(90deg, #ff2222, #ff6644)", transform: `scaleX(${reducedMotion ? 1 : progress})` }} />
+              <motion.i
+                style={{ background: "linear-gradient(90deg, #ff2222, #ff6644)" }}
+                animate={{ scaleX: reducedMotion ? 1 : progress }}
+                transition={{ duration: 0.05, ease: "linear" }}
+              />
             </div>
           </div>
         </div>
