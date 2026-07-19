@@ -436,7 +436,7 @@ canvas {
 /* ── ScrollReactiveHero ───────────────────────────────────────── */
 .rx-hero {
   position: relative;
-  height: 380svh;
+  height: 480svh;
   z-index: 2;
 }
 

@@ -6,31 +6,40 @@ import { useEffect, useRef, useState } from "react";
 
 const STAGES = [
   {
+    kicker: "Built from operational pressure",
+    titleA: "The field, the",
+    titleB: "data, the facts.",
+    lede: "Construction delays, scattered paperwork, missing context — these are not abstractions. They consume time, money, and trust. The work starts where standard software failed.",
+    image: "/assets/hero/hero-stage-1.png",
+    alt: "Dark construction site with holographic blueprint overlays and amber safety lighting",
+    tag: "01 / FIELD",
+  },
+  {
     kicker: "Dorian Apps / Agentic AI Studio",
     titleA: "AI that can",
     titleB: "carry the work.",
     lede: "Intelligent systems for operations where missing context, slow decisions, and disconnected tools have a real cost.",
-    image: "/assets/hero/hero-stage-1.png",
+    image: "/assets/hero/hero-stage-2.png",
     alt: "Polished black ring machine lit by blue and red light",
-    tag: "01 / CORE",
+    tag: "02 / CORE",
   },
   {
     kicker: "Autonomous agents / One system",
     titleA: "Agents that",
     titleB: "think in systems.",
     lede: "Specialist agents investigate, delegate, remember, and verify evidence before anything moves forward.",
-    image: "/assets/hero/hero-stage-2.png",
+    image: "/assets/hero/hero-stage-3.png",
     alt: "Network of glossy spheres connected by glowing threads",
-    tag: "02 / NETWORK",
+    tag: "03 / NETWORK",
   },
   {
     kicker: "Apps / Websites / Production",
     titleA: "Shipped as",
     titleB: "real products.",
     lede: "From agentic backends to the interfaces people touch — designed, built, and running in production.",
-    image: "/assets/hero/hero-stage-3.png",
+    image: "/assets/hero/hero-stage-4.png",
     alt: "Hands on a laptop surrounded by holographic app interfaces",
-    tag: "03 / PRODUCT",
+    tag: "04 / PRODUCT",
   },
 ] as const;
 
@@ -191,7 +200,7 @@ export function ScrollReactiveHero() {
 
           {/* Progress + scroll cue */}
           <div className="rx-hero-cue" aria-hidden="true">
-            <p className="flow-scroll-cue rx-hero-cue-label">SCROLL / ONE SYSTEM, THREE STATES</p>
+            <p className="flow-scroll-cue rx-hero-cue-label">SCROLL / ONE SYSTEM, FOUR STATES</p>
             <div className="rx-hero-progress">
               <i style={{ transform: `scaleX(${reducedMotion ? 1 : progress})` }} />
             </div>
