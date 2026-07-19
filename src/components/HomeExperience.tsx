@@ -1,6 +1,6 @@
 "use client";
 
-import { ScrollReactiveHero } from "@/components/ScrollReactiveHero";
+import { AIAwakeningHero } from "@/components/AIAwakeningHero";
 import { HomeOrigin } from "@/components/HomeOrigin";
 import { HomeProducts } from "@/components/HomeProducts";
 import { HomeAgents } from "@/components/HomeAgents";
@@ -10,7 +10,7 @@ import { HomeClose } from "@/components/HomeClose";
 export function HomeExperience() {
   return (
     <main id="main-content" className="flow-shell">
-      <ScrollReactiveHero />
+      <AIAwakeningHero />
       <HomeOrigin />
       <HomeProducts />
       <HomeAgents />
