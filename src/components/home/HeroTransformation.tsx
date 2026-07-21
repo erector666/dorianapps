@@ -1,55 +1,48 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useSyncExternalStore, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-/* ── Stage copy ── */
-const STAGE_COPY = [
-  "Work that has outgrown spreadsheets.",
-  "Scattered across emails, documents, chats \u2014 disconnected.",
-  "Connected by AI. Data flows where it should.",
-  "Automated. Accurate. Always current.",
-] as const;
-
-const STAGES = ["problem", "recognition", "orchestration", "clarity"] as const;
-type Stage = (typeof STAGES)[number];
-
-function deriveStage(progress: number): Stage {
-  if (progress < 0.25) return "problem";
-  if (progress < 0.50) return "recognition";
-  if (progress < 0.75) return "orchestration";
-  return "clarity";
+/* ── Stage data ── */
+interface StageData {
+  kicker: string;
+  headline: string;
+  desc: string;
+  cta?: { label: string; href: string };
 }
 
-/* ── Fragment position specs (from 600×600 SVG viewBox) ── */
-interface FragmentSpec {
-  id: string;
-  leftPct: number;
-  topPct: number;
-  nativeRotation: number;
-  timing: number;
-  width: number;
+const STAGES: StageData[] = [
+  {
+    kicker: "The Problem",
+    headline: "Work that has outgrown spreadsheets",
+    desc: "Operational friction scattered across disconnected systems",
+  },
+  {
+    kicker: "Recognition",
+    headline: "Scattered across emails, documents, chats",
+    desc: "The system begins to see the structure beneath the chaos",
+  },
+  {
+    kicker: "Orchestration",
+    headline: "Connected by AI. Data flows where it should.",
+    desc: "Worker and judge agents route, verify, and repair — autonomously",
+  },
+  {
+    kicker: "Operational Clarity",
+    headline: "Automated. Accurate. Always current.",
+    desc: "Human oversight where it matters. Machines where they excel.",
+    cta: { label: "See the work", href: "/work" },
+  },
+];
+
+function clamp01(v: number): number {
+  return Math.max(0, Math.min(1, v));
 }
 
-const BEFORE_FRAGMENTS: FragmentSpec[] = [
-  { id: "frag-spreadsheet", leftPct: 6.7, topPct: 11.7, nativeRotation: -8,  timing: 0.05, width: 22 },
-  { id: "frag-document",    leftPct: 9.2, topPct: 38.3, nativeRotation: 12,  timing: 0.08, width: 15 },
-  { id: "frag-email",       leftPct: 52,  topPct: 10,   nativeRotation: 5,   timing: 0.11, width: 28 },
-  { id: "frag-chat",        leftPct: 10,  topPct: 62,   nativeRotation: -15, timing: 0.14, width: 24 },
-  { id: "frag-card",        leftPct: 47,  topPct: 58,   nativeRotation: -22, timing: 0.17, width: 12 },
-];
-
-const AFTER_FRAGMENTS: FragmentSpec[] = [
-  { id: "frag-datasource",  leftPct: 10,  topPct: 20,  nativeRotation: 0, timing: 0.55, width: 18 },
-  { id: "frag-processing",  leftPct: 38,  topPct: 20,  nativeRotation: 0, timing: 0.58, width: 18 },
-  { id: "frag-output",      leftPct: 10,  topPct: 42,  nativeRotation: 0, timing: 0.62, width: 18 },
-  { id: "frag-dashboard",   leftPct: 38,  topPct: 42,  nativeRotation: 0, timing: 0.66, width: 18 },
-  { id: "frag-banner",      leftPct: 10,  topPct: 64,  nativeRotation: 0, timing: 0.70, width: 44 },
-  { id: "frag-arrows",      leftPct: 0,   topPct: 0,   nativeRotation: 0, timing: 0.72, width: 0 },
-];
-
-/* ── Inline SVG fragment renderers ── */
+/* ══════════════════════════════════════════════════════════════
+   SVG Fragment components
+   ══════════════════════════════════════════════════════════════ */
 
 function SpreadsheetFragment() {
   return (
@@ -126,13 +119,16 @@ function CardFragment() {
   );
 }
 
-const BEFORE_FRAGMENT_SVGS: Record<string, React.FC> = {
-  "frag-spreadsheet": SpreadsheetFragment,
-  "frag-document": DocumentFragment,
-  "frag-email": EmailFragment,
-  "frag-chat": ChatFragment,
-  "frag-card": CardFragment,
-};
+function ChaosArrowsSVG() {
+  return (
+    <svg viewBox="0 0 600 600" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style={{ position: "absolute", inset: 0 }}>
+      <path d="M200,130 C230,150 250,120 290,120" fill="none" stroke="#555" strokeWidth="1.5" strokeDasharray="4,4" opacity="0.5" />
+      <path d="M150,300 C180,380 150,400 90,400" fill="none" stroke="#555" strokeWidth="1.5" strokeDasharray="4,4" opacity="0.5" />
+      <path d="M250,410 C330,380 380,300 420,200" fill="none" stroke="#555" strokeWidth="1.5" strokeDasharray="4,4" opacity="0.5" />
+      <path d="M350,250 C320,350 400,450 300,460" fill="none" stroke="#555" strokeWidth="1" strokeDasharray="3,5" opacity="0.3" />
+    </svg>
+  );
+}
 
 function DataSourceFragment() {
   return (
@@ -208,108 +204,143 @@ function BannerFragment() {
   );
 }
 
-const AFTER_FRAGMENT_SVGS: Record<string, React.FC> = {
-  "frag-datasource": DataSourceFragment,
-  "frag-processing": ProcessingFragment,
-  "frag-output": OutputFragment,
-  "frag-dashboard": DashboardFragment,
-  "frag-banner": BannerFragment,
-};
+/* ══════════════════════════════════════════════════════════════
+   Stage Layer — one per stage
+   ══════════════════════════════════════════════════════════════ */
 
-/* ── Chaos Arrows (dashed connectors from before SVG) ── */
-function ChaosArrowsSVG() {
-  return (
-    <svg
-      viewBox="0 0 600 600"
-      width="100%"
-      height="100%"
-      preserveAspectRatio="xMidYMid meet"
-      style={{ position: "absolute", inset: 0 }}
-    >
-      <path d="M200,130 C230,150 250,120 290,120" fill="none" stroke="#555" strokeWidth="1.5" strokeDasharray="4,4" opacity="0.5" />
-      <path d="M150,300 C180,380 150,400 90,400" fill="none" stroke="#555" strokeWidth="1.5" strokeDasharray="4,4" opacity="0.5" />
-      <path d="M250,410 C330,380 380,300 420,200" fill="none" stroke="#555" strokeWidth="1.5" strokeDasharray="4,4" opacity="0.5" />
-      <path d="M350,250 C320,350 400,450 300,460" fill="none" stroke="#555" strokeWidth="1" strokeDasharray="3,5" opacity="0.3" />
-    </svg>
-  );
+interface StageLayerProps {
+  stage: number;
+  data: StageData;
+  progress: number;
+  currentStage: number;
 }
 
-/* ── Pipeline Arrows (stroke-dashoffset draw effect) ── */
-function PipelineArrowsSVG() {
-  return (
-    <svg
-      viewBox="0 0 600 600"
-      width="100%"
-      height="100%"
-      preserveAspectRatio="xMidYMid meet"
-      style={{ position: "absolute", inset: 0 }}
-    >
-      <defs>
-        <marker id="arrowPipeline" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M0,0 L10,5 L0,10 Z" fill="#f59e0b" />
-        </marker>
-      </defs>
-      <line className="pipe-line" x1="160" y1="140" x2="210" y2="140" stroke="#f59e0b" strokeWidth="2" markerEnd="url(#arrowPipeline)" />
-      <line className="pipe-line" x1="345" y1="140" x2="395" y2="140" stroke="#f59e0b" strokeWidth="2" markerEnd="url(#arrowPipeline)" />
-      <line className="pipe-line" x1="95" y1="180" x2="95" y2="228" stroke="#f59e0b" strokeWidth="2" markerEnd="url(#arrowPipeline)" />
-      <line className="pipe-line" x1="280" y1="180" x2="280" y2="228" stroke="#f59e0b" strokeWidth="2" markerEnd="url(#arrowPipeline)" />
-      <line className="pipe-line" x1="95" y1="310" x2="95" y2="358" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="3,3" opacity="0.5" />
-      <line className="pipe-line" x1="280" y1="310" x2="280" y2="358" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="3,3" opacity="0.5" />
-    </svg>
-  );
-}
+function StageLayer({ stage, data, progress, currentStage }: StageLayerProps) {
+  const isCurrent = stage === currentStage;
+  const N = STAGES.length;
 
-/* ── Stage indicator dots ── */
-function StageIndicator({ stage }: { stage: Stage }) {
-  const idx = STAGES.indexOf(stage);
+  const stageStart = stage / N;
+  const stageEnd = (stage + 1) / N;
+  const fadeZone = 0.03;
+
+  let opacity = 0;
+  if (progress >= stageStart - fadeZone && progress <= stageEnd + fadeZone) {
+    if (progress < stageStart) {
+      opacity = (progress - (stageStart - fadeZone)) / fadeZone;
+    } else if (progress > stageEnd) {
+      opacity = 1 - (progress - stageEnd) / fadeZone;
+    } else {
+      opacity = 1;
+    }
+  }
+  opacity = clamp01(opacity);
+
+  const showBeforeFrags = stage === 1;
+  const showAfterFrags = stage === 2;
+
   return (
-    <div className="hero-transform-indicator" aria-hidden="true">
-      {STAGES.map((s, i) => (
-        <div
-          key={s}
-          className="hero-transform-dot"
-          data-active={i === idx ? "true" : "false"}
+    <div
+      className="hero-scroll-stage-layer"
+      data-stage={stage}
+      data-active={isCurrent ? "true" : "false"}
+      style={{ opacity }}
+    >
+      <div
+        className="hero-scroll-builder-wrap"
+        style={{
+          filter: stage >= 3 ? "blur(4px) brightness(0.5)" : stage >= 2 ? "blur(1px) brightness(0.8)" : "none",
+        }}
+      >
+        <Image
+          src={`/assets/hero-stage-${stage + 1}.webp`}
+          alt="Nik Velkovski — AI product builder and systems developer"
+          fill
+          priority={stage === 0}
+          className="hero-scroll-builder-img"
+          sizes="100vw"
         />
-      ))}
+      </div>
+
+      {showBeforeFrags && (
+        <div className="hero-scroll-overlay" style={{ opacity: clamp01((progress - 0.25) / 0.08) }}>
+          <ChaosArrowsSVG />
+          <div className="hero-scroll-fragments">
+            <div className="hero-scroll-frag" style={{ left: "6.7%", top: "11.7%", width: "22vw", transform: "translate(-50%,-50%) rotate(-8deg)" }}>
+              <SpreadsheetFragment />
+            </div>
+            <div className="hero-scroll-frag" style={{ left: "9.2%", top: "38.3%", width: "15vw", transform: "translate(-50%,-50%) rotate(12deg)" }}>
+              <DocumentFragment />
+            </div>
+            <div className="hero-scroll-frag" style={{ left: "52%", top: "10%", width: "28vw", transform: "translate(-50%,-50%) rotate(5deg)" }}>
+              <EmailFragment />
+            </div>
+            <div className="hero-scroll-frag" style={{ left: "10%", top: "62%", width: "24vw", transform: "translate(-50%,-50%) rotate(-15deg)" }}>
+              <ChatFragment />
+            </div>
+            <div className="hero-scroll-frag" style={{ left: "47%", top: "58%", width: "12vw", transform: "translate(-50%,-50%) rotate(-22deg)" }}>
+              <CardFragment />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAfterFrags && (
+        <div className="hero-scroll-overlay" style={{ opacity: clamp01((progress - 0.50) / 0.08) }}>
+          <div className="hero-scroll-fragments">
+            <div className="hero-scroll-frag" style={{ left: "10%", top: "20%", width: "18vw" }}>
+              <DataSourceFragment />
+            </div>
+            <div className="hero-scroll-frag" style={{ left: "38%", top: "20%", width: "18vw" }}>
+              <ProcessingFragment />
+            </div>
+            <div className="hero-scroll-frag" style={{ left: "10%", top: "42%", width: "18vw" }}>
+              <OutputFragment />
+            </div>
+            <div className="hero-scroll-frag" style={{ left: "38%", top: "42%", width: "18vw" }}>
+              <DashboardFragment />
+            </div>
+            <div className="hero-scroll-frag" style={{ left: "10%", top: "64%", width: "44vw" }}>
+              <BannerFragment />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="hero-scroll-gradient" />
+
+      <div className="hero-scroll-copy" style={{ opacity: isCurrent ? 1 : 0 }}>
+        <span className="hero-scroll-kicker">{data.kicker}</span>
+        <h2 className="hero-scroll-headline">{data.headline}</h2>
+        <p className="hero-scroll-desc">{data.desc}</p>
+        {data.cta && (
+          <Link href={data.cta.href} className="hero-scroll-cta">
+            {data.cta.label} <span aria-hidden="true">→</span>
+          </Link>
+        )}
+      </div>
     </div>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   HeroTransformation — main component
-   ═══════════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════
+   Main Component
+   ══════════════════════════════════════════════════════════════ */
 
-interface HeroTransformationProps {
-  className?: string;
-}
+const subscribe = () => () => {};
+const clientSnapshot = () => true;
+const serverSnapshot = () => false;
 
-export function HeroTransformation({ className }: HeroTransformationProps) {
-  const [mounted, setMounted] = useState(false);
+export function HeroTransformation() {
+  const mounted = useSyncExternalStore(subscribe, clientSnapshot, serverSnapshot);
   const [isMobile, setIsMobile] = useState(false);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
-  const [stage, setStage] = useState<Stage>("problem");
-  const stageRef = useRef<Stage>("problem");
+  const [progress, setProgress] = useState(0);
+  const [currentStage, setCurrentStage] = useState(0);
 
-  const scrollSpaceRef = useRef<HTMLDivElement>(null);
-  const builderRef = useRef<HTMLImageElement>(null);
-  const builderMaskRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const tickingRef = useRef(false);
+  const rafRef = useRef<number | null>(null);
 
-  const beforeFragRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const afterFragRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  const chaosArrowsRef = useRef<HTMLDivElement>(null);
-  const pipelineArrowsRef = useRef<HTMLDivElement>(null);
-
-  const heroCopyRef = useRef<HTMLDivElement>(null);
-  const stageCopyRefs = useRef<(HTMLParagraphElement | null)[]>([]);
-
-  const stInstancesRef = useRef<ScrollTriggerInstance[]>([]);
-  const rafIdRef = useRef<number | null>(null);
-
-  /* ── Mount ── */
-  useEffect(() => { setMounted(true); }, []);
-
-  /* ── Mobile + reduced-motion detection ── */
   useEffect(() => {
     const mqMobile = window.matchMedia("(max-width: 767px)");
     const mqReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -326,510 +357,142 @@ export function HeroTransformation({ className }: HeroTransformationProps) {
     };
   }, []);
 
-  /* ── GSAP setup (desktop, non-reduced) ── */
+  /* ── rAF scroll tracking (desktop, non-reduced) ── */
   useEffect(() => {
     if (!mounted || isMobile || isReducedMotion) return;
 
-    const scrollSpace = scrollSpaceRef.current;
-    const builder = builderRef.current;
-    const builderMask = builderMaskRef.current;
-    const chaosArrows = chaosArrowsRef.current;
-    const pipelineArrows = pipelineArrowsRef.current;
-    const heroCopy = heroCopyRef.current;
+    const section = sectionRef.current;
+    if (!section) return;
 
-    if (!scrollSpace || !builder) return;
+    const N = STAGES.length;
 
-    let cancelled = false;
+    const onScroll = () => {
+      if (tickingRef.current) return;
+      tickingRef.current = true;
 
-    void (async () => {
-      const [{ gsap }, { ScrollTrigger }] = await Promise.all([
-        import("gsap"),
-        import("gsap/ScrollTrigger"),
-      ]);
+      rafRef.current = requestAnimationFrame(() => {
+        tickingRef.current = false;
 
-      if (cancelled) return;
-      gsap.registerPlugin(ScrollTrigger);
+        const rect = section.getBoundingClientRect();
+        const p = clamp01(-rect.top / (rect.height - window.innerHeight));
+        const stage = Math.min(Math.floor(p * N), N - 1);
 
-      // Set initial states
-      gsap.set(builder, { scale: 1, opacity: 1, filter: "blur(0px)" });
-      if (builderMask) gsap.set(builderMask, { clipPath: "circle(100% at 50% 50%)" });
-
-      beforeFragRefs.current.forEach((ref, i) => {
-        if (ref) {
-          const frag = BEFORE_FRAGMENTS[i];
-          gsap.set(ref, { opacity: 0, scale: 0.85, rotation: frag.nativeRotation });
-        }
+        setProgress(p);
+        setCurrentStage(stage);
       });
+    };
 
-      if (chaosArrows) gsap.set(chaosArrows, { opacity: 0 });
-
-      afterFragRefs.current.forEach((ref) => {
-        if (ref) gsap.set(ref, { opacity: 0, scale: 0.92 });
-      });
-
-      // Pipeline arrows setup
-      if (pipelineArrows) {
-        const lines = pipelineArrows.querySelectorAll(".pipe-line");
-        lines.forEach((line) => {
-          const len = (line as SVGLineElement).getTotalLength();
-          gsap.set(line, { strokeDasharray: len, strokeDashoffset: len });
-        });
-        gsap.set(pipelineArrows, { opacity: 0 });
-      }
-
-      // Stage copy
-      stageCopyRefs.current.forEach((ref, i) => {
-        if (ref) gsap.set(ref, { opacity: i === 0 ? 1 : 0 });
-      });
-
-      if (heroCopy) gsap.set(heroCopy, { opacity: 1 });
-
-      // ── Timeline ──
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: scrollSpace,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 1.0,
-          invalidateOnRefresh: true,
-          onUpdate: (self: { progress: number }) => {
-            const currentStage = deriveStage(self.progress);
-            if (currentStage !== stageRef.current) {
-              stageRef.current = currentStage;
-              setStage(currentStage);
-            }
-          },
-        },
-      });
-
-      // Builder image
-      tl.fromTo(
-        builder,
-        { scale: 1, opacity: 1, filter: "blur(0px)" },
-        { scale: 0.35, opacity: 0.12, filter: "blur(8px)", ease: "none" },
-        0,
-      );
-
-      // Builder radial mask (stage 3)
-      if (builderMask) {
-        tl.fromTo(
-          builderMask,
-          { clipPath: "circle(100% at 50% 50%)" },
-          { clipPath: "circle(40% at 50% 50%)", ease: "none" },
-          0.50,
-        );
-      }
-
-      // Hero copy fades out
-      if (heroCopy) {
-        tl.to(heroCopy, { opacity: 0, duration: 0.06, ease: "power2.in" }, 0.18);
-      }
-
-      // Before fragments: staggered in, then dissolve
-      BEFORE_FRAGMENTS.forEach((frag, i) => {
-        const ref = beforeFragRefs.current[i];
-        if (!ref) return;
-        tl.fromTo(
-          ref,
-          { opacity: 0, scale: 0.85, rotation: frag.nativeRotation + 5 },
-          { opacity: 1, scale: 1, rotation: frag.nativeRotation, duration: 0.08, ease: "power2.out" },
-          frag.timing,
-        );
-        tl.to(
-          ref,
-          { opacity: 0, scale: 0.92, filter: "blur(3px)", duration: 0.10, ease: "power2.in" },
-          0.50,
-        );
-      });
-
-      // Chaos arrows
-      if (chaosArrows) {
-        tl.fromTo(chaosArrows, { opacity: 0 }, { opacity: 1, duration: 0.05 }, 0.05);
-        tl.to(chaosArrows, { opacity: 0, duration: 0.08 }, 0.50);
-      }
-
-      // After fragments: staggered in
-      AFTER_FRAGMENTS.forEach((frag, i) => {
-        if (frag.id === "frag-arrows") return;
-        const ref = afterFragRefs.current[i];
-        if (!ref) return;
-        tl.fromTo(
-          ref,
-          { opacity: 0, scale: 0.92 },
-          { opacity: 1, scale: 1, duration: 0.07, ease: "power2.out" },
-          frag.timing,
-        );
-      });
-
-      // Pipeline arrows: stroke-dashoffset draw
-      if (pipelineArrows) {
-        const lines = pipelineArrows.querySelectorAll(".pipe-line");
-        lines.forEach((line) => {
-          const len = (line as SVGLineElement).getTotalLength();
-          tl.fromTo(
-            line,
-            { strokeDashoffset: len },
-            { strokeDashoffset: 0, duration: 0.12, ease: "power2.inOut" },
-            0.58,
-          );
-        });
-        tl.fromTo(pipelineArrows, { opacity: 0 }, { opacity: 1, duration: 0.01 }, 0.58);
-      }
-
-      // Stage copy — visible across each full 25% stage with 5% crossfade at boundaries
-      for (let i = 0; i < 4; i++) {
-        const ref = stageCopyRefs.current[i];
-        if (!ref) continue;
-        if (i === 0) {
-          // Stage 0: visible from 0 → fades out at 0.20-0.25
-          tl.to(ref, { opacity: 0, duration: 0.05, ease: "power2.in" }, 0.20);
-        } else if (i < 3) {
-          // Stages 1-2: fades in 0.05 before stage start, visible through, fades out 0.05 before end
-          tl.fromTo(ref, { opacity: 0 }, { opacity: 1, duration: 0.05, ease: "power2.out" }, i * 0.25 - 0.05);
-          tl.to(ref, { opacity: 0, duration: 0.05, ease: "power2.in" }, i * 0.25 + 0.20);
-        } else {
-          // Stage 3: fades in at 0.70, stays visible to end
-          tl.fromTo(ref, { opacity: 0 }, { opacity: 1, duration: 0.05, ease: "power2.out" }, 0.70);
-        }
-      }
-
-      // ── Stage 2 oscillation (RAF loop) ──
-      const oscillate = () => {
-        if (cancelled) return;
-        const allSt = ScrollTrigger.getAll() as ScrollTriggerInstance[];
-        if (allSt.length === 0) {
-          rafIdRef.current = requestAnimationFrame(oscillate);
-          return;
-        }
-        const p = (allSt[0].progress as number) ?? 0;
-        if (p < 0.25 || p > 0.50) {
-          rafIdRef.current = requestAnimationFrame(oscillate);
-          return;
-        }
-        const t = performance.now() * 0.001;
-        beforeFragRefs.current.forEach((ref, i) => {
-          if (!ref) return;
-          const phase = i * 0.7;
-          const x = Math.sin(t * 1.2 + phase) * 2;
-          const y = Math.cos(t * 0.9 + phase) * 2;
-          const r = Math.sin(t * 0.6 + phase) * 1;
-          const baseRotation = BEFORE_FRAGMENTS[i].nativeRotation;
-          ref.style.transform = "translate(" + x + "px, " + y + "px) rotate(" + (baseRotation + r) + "deg)";
-        });
-        rafIdRef.current = requestAnimationFrame(oscillate);
-      };
-      rafIdRef.current = requestAnimationFrame(oscillate);
-
-      // Store for cleanup
-      stInstancesRef.current = ScrollTrigger.getAll() as ScrollTriggerInstance[];
-    })();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
 
     return () => {
-      cancelled = true;
-      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
-      stInstancesRef.current.forEach((t) => t.kill());
-      stInstancesRef.current = [];
+      window.removeEventListener("scroll", onScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [mounted, isMobile, isReducedMotion]);
-
-  /* ── Reduced-motion: instant stage switching ── */
-  useEffect(() => {
-    if (!mounted || isMobile || !isReducedMotion) return;
-
-    const scrollSpace = scrollSpaceRef.current;
-    if (!scrollSpace) return;
-
-    let cancelled = false;
-
-    void (async () => {
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      const { gsap } = await import("gsap");
-      if (cancelled) return;
-      gsap.registerPlugin(ScrollTrigger);
-
-      stageCopyRefs.current.forEach((ref, i) => {
-        if (ref) ref.style.opacity = i === 0 ? "1" : "0";
-      });
-
-      const st = ScrollTrigger.create({
-        trigger: scrollSpace,
-        start: "top top",
-        end: "bottom bottom",
-        onUpdate: (self: { progress: number }) => {
-          const currentStage = deriveStage(self.progress);
-          if (currentStage !== stageRef.current) {
-            stageRef.current = currentStage;
-            setStage(currentStage);
-          }
-          stageCopyRefs.current.forEach((ref, i) => {
-            if (ref) ref.style.opacity = STAGES[i] === currentStage ? "1" : "0";
-          });
-        },
-      });
-
-      stInstancesRef.current = [st as unknown as ScrollTriggerInstance];
-    })();
-
-    return () => {
-      cancelled = true;
-      stInstancesRef.current.forEach((t) => t.kill());
-      stInstancesRef.current = [];
-    };
-  }, [mounted, isMobile, isReducedMotion]);
-
-  /* ── Ref setters ── */
-  const setBeforeFragRef = useCallback((i: number) => (el: HTMLDivElement | null) => {
-    beforeFragRefs.current[i] = el;
-  }, []);
-
-  const setAfterFragRef = useCallback((i: number) => (el: HTMLDivElement | null) => {
-    afterFragRefs.current[i] = el;
-  }, []);
-
-  const setStageCopyRef = useCallback((i: number) => (el: HTMLParagraphElement | null) => {
-    stageCopyRefs.current[i] = el;
-  }, []);
-
-  /* ── Build fragment style ── */
-  const fragStyle = (frag: FragmentSpec) =>
-    ({
-      left: frag.leftPct + "%",
-      top: frag.topPct + "%",
-      width: frag.width + "vw",
-      transform: "translate(-50%, -50%) rotate(" + frag.nativeRotation + "deg)",
-    }) as React.CSSProperties;
-
-  /* ══════════════════════════════════════════════════════════════
-     RENDER
-     ══════════════════════════════════════════════════════════════ */
 
   if (!mounted) {
+    return <div className="hero-scroll-section" />;
+  }
+
+  /* ── Mobile: static first stage ── */
+  if (isMobile) {
+    const s0 = STAGES[0];
     return (
-      <div
-        className={"hero-transform-scroll" + (className ? " " + className : "")}
-        style={{ height: isMobile ? "auto" : "400vh" }}
-      />
+      <section className="hero-scroll-section-mobile">
+        <div className="hero-scroll-mobile-image">
+          <Image
+            src="/assets/hero-stage-1.webp"
+            alt="Nik Velkovski — AI product builder and systems developer"
+            fill
+            priority
+            className="hero-scroll-builder-img"
+            sizes="100vw"
+          />
+        </div>
+        <div className="hero-scroll-mobile-copy">
+          <span className="hero-scroll-kicker">{s0.kicker}</span>
+          <h2 className="hero-scroll-headline">{s0.headline}</h2>
+          <p className="hero-scroll-desc">{s0.desc}</p>
+          <Link href="/work" className="hero-scroll-cta">
+            See the work <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+      </section>
     );
   }
 
-  return (
-    <div className={"hero-transform-scroll" + (className ? " " + className : "")} ref={scrollSpaceRef}>
-      {isMobile || isReducedMotion ? (
-        /* ── Mobile / Reduced-motion: static stacked panels ── */
-        <div className="hero-transform-mobile-panels">
-          {/* Builder image */}
-          <div className="hero-transform-mobile-panel" style={{ paddingTop: "5rem" }}>
-            <Image
-              src="/assets/the-builder.webp"
-              alt="Nik Velkovski — AI product builder and systems developer"
-              width={400}
-              height={500}
-              priority
-              className="hero-transform-mobile-builder"
-            />
-          </div>
-
-          {/* Hero copy */}
-          <div className="hero-transform-mobile-panel" style={{ borderTop: "none", paddingTop: "1rem" }}>
-            <div className="text-center" style={{ maxWidth: "400px" }}>
-              <p className="eyebrow">Systematic AI product development</p>
-              <h1 style={{
-                margin: "0.5rem 0",
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(1.8rem, 8vw, 2.5rem)",
-                fontWeight: 700,
-                lineHeight: 0.95,
-                letterSpacing: "-0.025em",
-              }}>
-                Software for work that has outgrown spreadsheets
-              </h1>
-              <p style={{ color: "var(--color-muted)", fontSize: "1rem", lineHeight: 1.5, marginTop: "0.75rem" }}>
-                I&apos;m Nik — I build AI systems, autonomous agents, and operational software.
-              </p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", justifyContent: "center", marginTop: "1.5rem" }}>
-                <Link href="/work" className="cta-primary">
-                  See the work <span aria-hidden="true">→</span>
-                </Link>
-                <Link href="/contact" className="cta-secondary">
-                  Describe the problem <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Stage panels */}
-          {STAGES.map((s, i) => {
-            const showBeforeFrag = i < 2 && BEFORE_FRAGMENT_SVGS[BEFORE_FRAGMENTS[i === 0 ? 0 : 2].id];
-            const showAfterFrag = i >= 2 && AFTER_FRAGMENT_SVGS[AFTER_FRAGMENTS[i === 2 ? 1 : 3].id];
-            const FragComponent = showBeforeFrag || showAfterFrag;
-            return (
-              <div key={s} className="hero-transform-mobile-panel">
-                {FragComponent && (
-                  <div style={{ width: "100%", maxWidth: "340px", opacity: i < 2 ? 0.6 : 0.85 }}>
-                    <FragComponent />
-                  </div>
-                )}
-                <p className="hero-transform-mobile-copy">{STAGE_COPY[i]}</p>
-              </div>
-            );
-          })}
-
-          {/* Mobile CTA */}
-          <div className="hero-transform-mobile-panel" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-            <Link href="/work" className="cta-primary">
-              See the work <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-        </div>
-      ) : (
-        /* ── Desktop: sticky scroll ── */
-        <>
-          {/* Sticky viewport */}
-          <div className="hero-transform-sticky">
-            {/* Builder image */}
-            <div ref={builderMaskRef} className="hero-transform-builder-mask">
+  /* ── Reduced-motion: static stage 0 ── */
+  if (isReducedMotion) {
+    const s0 = STAGES[0];
+    return (
+      <section className="hero-scroll-section" ref={sectionRef}>
+        <div className="hero-scroll-sticky">
+          <div className="hero-scroll-stage-layer" data-stage={0} data-active="true" style={{ opacity: 1 }}>
+            <div className="hero-scroll-builder-wrap" style={{ transform: "scale(1)" }}>
               <Image
-                ref={builderRef}
-                src="/assets/the-builder.webp"
+                src="/assets/hero-stage-1.webp"
                 alt="Nik Velkovski — AI product builder and systems developer"
                 fill
                 priority
-                className="hero-transform-builder"
+                className="hero-scroll-builder-img"
                 sizes="100vw"
               />
             </div>
-
-            {/* Before fragments */}
-            {BEFORE_FRAGMENTS.map((frag, i) => {
-              const FragSVG = BEFORE_FRAGMENT_SVGS[frag.id];
-              return (
-                <div
-                  key={frag.id}
-                  ref={setBeforeFragRef(i)}
-                  className="hero-transform-fragment"
-                  style={fragStyle(frag)}
-                >
-                  {FragSVG && <FragSVG />}
-                </div>
-              );
-            })}
-
-            {/* Chaos arrows */}
-            <div ref={chaosArrowsRef} className="hero-transform-layer">
-              <ChaosArrowsSVG />
-            </div>
-
-            {/* After fragments */}
-            {AFTER_FRAGMENTS.map((frag, i) => {
-              if (frag.id === "frag-arrows") return null;
-              const FragSVG = AFTER_FRAGMENT_SVGS[frag.id];
-              if (!FragSVG) return null;
-              return (
-                <div
-                  key={frag.id}
-                  ref={setAfterFragRef(i)}
-                  className="hero-transform-fragment"
-                  style={fragStyle(frag)}
-                >
-                  <FragSVG />
-                </div>
-              );
-            })}
-
-            {/* Pipeline arrows */}
-            <div ref={pipelineArrowsRef} className="hero-transform-layer">
-              <PipelineArrowsSVG />
-            </div>
-
-            {/* Stage copy */}
-            <div className="hero-transform-copy">
-              {STAGE_COPY.map((text, i) => (
-                <p
-                  key={i}
-                  ref={setStageCopyRef(i)}
-                  className="hero-transform-copy-text"
-                  style={{
-                    position: i === 0 ? "relative" : "absolute",
-                    inset: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    opacity: i === 0 ? 1 : 0,
-                  }}
-                >
-                  {text}
-                </p>
-              ))}
-            </div>
-
-            {/* Stage indicator dots */}
-            <StageIndicator stage={stage} />
-
-            {/* Stage 4 CTA */}
-            {stage === "clarity" && (
-              <div
-                className="hero-transform-copy"
-                style={{ bottom: "clamp(7rem, 14vh, 10rem)", pointerEvents: "auto" }}
-              >
-                <Link
-                  href="/work"
-                  className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-accent border-b border-accent/40 pb-0.5 hover:border-accent transition-colors"
-                  style={{ pointerEvents: "auto" }}
-                >
-                  See the work <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Hero copy overlay (fades out after stage 1) */}
-          <div
-            ref={heroCopyRef}
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100vh",
-              display: "flex",
-              alignItems: "center",
-              pointerEvents: "none",
-              zIndex: 30,
-            }}
-          >
-            <div className="container" style={{ pointerEvents: "auto" }}>
-              <div className="home-hero-grid" style={{ minHeight: "auto", paddingTop: 0 }}>
-                <div className="home-hero-copy">
-                  <p className="eyebrow">Systematic AI product development</p>
-                  <h1>Software for work that has outgrown spreadsheets</h1>
-                  <p className="section-lede">
-                    I&apos;m Nik — I build AI systems, autonomous agents, and operational software.
-                    Each system starts by watching real work happen and ends with something that survives
-                    contact with the real world.
-                  </p>
-                  <div className="home-hero-cta">
-                    <Link href="/work" className="cta-primary">
-                      See the work <span aria-hidden="true">→</span>
-                    </Link>
-                    <Link href="/contact" className="cta-secondary">
-                      Describe the problem <span aria-hidden="true">→</span>
-                    </Link>
-                  </div>
-                </div>
-                <div />
-              </div>
+            <div className="hero-scroll-gradient" />
+            <div className="hero-scroll-copy" style={{ opacity: 1 }}>
+              <span className="hero-scroll-kicker">{s0.kicker}</span>
+              <h2 className="hero-scroll-headline">{s0.headline}</h2>
+              <p className="hero-scroll-desc">{s0.desc}</p>
             </div>
           </div>
-        </>
-      )}
-    </div>
+          <div className="hero-scroll-progress">
+            <i className="hero-scroll-progress-fill" style={{ transform: "scaleX(1)" }} />
+          </div>
+          <div className="hero-scroll-rail">
+            {STAGES.map((_, i) => (
+              <div key={i} className={`hero-scroll-rail-dot${i === 0 ? " is-active" : ""}`}>
+                {i + 1}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  /* ── Desktop: full scroll-triggered stage reveal ── */
+  return (
+    <section className="hero-scroll-section" ref={sectionRef}>
+      <div className="hero-scroll-sticky">
+        {STAGES.map((data, i) => (
+          <StageLayer
+            key={i}
+            stage={i}
+            data={data}
+            progress={progress}
+            currentStage={currentStage}
+          />
+        ))}
+
+        <div className="hero-scroll-progress">
+          <i
+            className="hero-scroll-progress-fill"
+            style={{ transform: `scaleX(${progress})` }}
+          />
+        </div>
+
+        <div className="hero-scroll-rail">
+          {STAGES.map((_, i) => (
+            <div
+              key={i}
+              className={`hero-scroll-rail-dot${i === currentStage ? " is-active" : ""}`}
+            >
+              {i + 1}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
-
-/* ── Types ── */
-type ScrollTriggerInstance = {
-  progress?: number;
-  kill: () => void;
-  vars?: { trigger?: Element | null };
-  getAll?: () => ScrollTriggerInstance[];
-};
