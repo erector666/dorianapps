@@ -1,0 +1,198 @@
+{
+  "phase": "Phase 8 — Multi-Page Expansion",
+  "project_root": "/root/dorianapps",
+  "build_status": "✅ 0 errors, 15 routes (14 specified + /ai-awakening)",
+  "verdict": "PASS_WITH_ISSUES",
+  "summary": "The 3 audit fixes are correctly applied and verified. However, adversarial inspection uncovered 2 broken experiment-slug links on the Home page that the audit missed, and a self-referential link on Fenix Plus SA. These are real navigation defects that will produce 404s for users clicking from the Home page Lab preview.",
+  "checks": {
+    "1_shared_elements_consistent": {
+      "status": "PASS",
+      "header": {
+        "verdict": "Consistent",
+        "detail": "All 14 pages import Header from @/components/Header. Same primaryLinks from @/data/navigation.ts. ai-awakening page is an exception (uses AIAwakeningHero, no Header) but is not part of the 14 specified pages."
+      },
+      "footer": {
+        "verdict": "Consistent",
+        "detail": "Footer rendered globally in root layout.tsx. Single source of truth. Contact page duplicate footer confirmed removed."
+      },
+      "navigation": {
+        "verdict": "Consistent",
+        "detail": "All 7 primaryLinks resolve to existing routes. Header and Footer share the same navigation data source."
+      },
+      "buttons_cta": {
+        "verdict": "Acceptable variance",
+        "detail": ".cta-primary and .cta-secondary used on Home/Work/Capabilities/Approach/Lab. About and Contact use inline Tailwind (white-on-black CTA differs from purple .cta-primary). Product pages use per-product accent colors via inline styles. Audit rationale accepted."
+      },
+      "cards_typography": {
+        "verdict": "Consistent",
+        "detail": "glass-panel rounded-2xl p-6, font-display, font-mono, .eyebrow, .section-title, .section-lede used consistently across all pages."
+      }
+    },
+    "2_distinct_purpose_per_page": {
+      "status": "PASS",
+      "verdict": "No duplicate content detected",
+      "detail": "All 14 pages serve distinct purposes. Home previews link to full pages — functional cross-referencing, not duplication. Product pages share structural template but have unique content, features, tech stacks, and use cases per product."
+    },
+    "3_all_pages_exist": {
+      "status": "PASS",
+      "verdict": "All 14 routes confirmed with source files",
+      "routes_verified": [
+        { "route": "/", "file": "src/app/page.tsx" },
+        { "route": "/work", "file": "src/app/work/page.tsx" },
+        { "route": "/work/fenix-plus-sa", "file": "src/app/work/fenix-plus-sa/page.tsx" },
+        { "route": "/capabilities", "file": "src/app/capabilities/page.tsx" },
+        { "route": "/approach", "file": "src/app/approach/page.tsx" },
+        { "route": "/lab", "file": "src/app/lab/page.tsx" },
+        { "route": "/lab/[slug]", "file": "src/app/lab/[slug]/page.tsx" },
+        { "route": "/about", "file": "src/app/about/page.tsx" },
+        { "route": "/contact", "file": "src/app/contact/page.tsx" },
+        { "route": "/_not-found", "file": "src/app/not-found.tsx" },
+        { "route": "/products/docvault", "file": "src/app/products/docvault/page.tsx" },
+        { "route": "/products/codexpilot", "file": "src/app/products/codexpilot/page.tsx" },
+        { "route": "/products/fenix-construction-tracker", "file": "src/app/products/fenix-construction-tracker/page.tsx" },
+        { "route": "/products/0brain", "file": "src/app/products/0brain/page.tsx" }
+      ]
+    },
+    "4_navigation_between_pages": {
+      "status": "FAIL",
+      "verdict": "3 broken/misleading links found that the audit missed",
+      "issues": [
+        {
+          "severity": "HIGH",
+          "page": "Home (src/app/page.tsx, lines 198-210)",
+          "description": "2 of 5 Lab experiment preview links generate slugs that don't match the actual experiment slugs in lab/[slug]/page.tsx, producing 404 errors",
+          "broken_links": [
+            {
+              "displayed_title": "Multi-Format Document Understanding",
+              "generated_slug": "multi-format-document-understanding",
+              "actual_slug": "document-understanding-pipeline",
+              "result": "404 — page not found"
+            },
+            {
+              "displayed_title": "Android-Native Coding Agent",
+              "generated_slug": "android-native-coding-agent",
+              "actual_slug": "android-coding-agent",
+              "result": "404 — page not found"
+            }
+          ],
+          "matching_links": [
+            { "title": "Agent Memory Persistence", "slug": "agent-memory-persistence", "status": "OK" },
+            { "title": "Verification Gate Pattern", "slug": "verification-gate-pattern", "status": "OK" },
+            { "title": "Multi-Agent Orchestration", "slug": "multi-agent-orchestration", "status": "OK" }
+          ],
+          "root_cause": "Home page generates slugs via `exp.title.toLowerCase().replace(/\\s+/g, '-')` but lab/[slug] uses manually-defined slugs that differ from the title-to-slug algorithm."
+        },
+        {
+          "severity": "LOW",
+          "page": "Work/Fenix+SA (src/app/work/fenix-plus-sa/page.tsx, line 38)",
+          "description": "Self-referential link: the 'Project details' button links to /work/fenix-plus-sa — the current page itself. This is a no-op navigation.",
+          "code": "<Link href=\"/work/fenix-plus-sa\" ...>Project details</Link>"
+        }
+      ],
+      "links_verified_ok": [
+        "All 7 primaryLinks in Header → valid routes",
+        "All Footer links → valid routes",
+        "Product cross-links (CodexPilot→DocVault, Fenix→DocVault, Fenix→CodexPilot, 0Brain→CodexPilot, 0Brain→DocVault) — all valid",
+        "Lab index → lab/[slug] links — all valid",
+        "Lab detail → back to /lab — valid",
+        "404 → / and /products/docvault — valid",
+        "Home CTAs to /work, /contact, /about, /capabilities, /lab — all valid"
+      ]
+    },
+    "5_design_system_consistent": {
+      "status": "PASS_WITH_NOTE",
+      "verdict": "Design tokens and CSS variables used consistently across all 14 specified pages. ai-awakening page (15th route, not in scope) has hardcoded colors.",
+      "tokens_verified": {
+        "css_variables": ["--color-bg (#08090A)", "--color-text (#EAEAEC)", "--color-muted (#858993)", "--color-accent (#8B5CF6)"],
+        "accent_palette": ["--accent-amber (#F59E0B)", "--accent-cyan (#06B6D4)", "--accent-green (#10B981)", "--accent-violet (#8B5CF6)", "--accent-gold (#D4A853)"],
+        "spacing": ".section padding: clamp(5rem, 10vw, 9rem) 0 — consistent",
+        "typography": "font-body (Inter), font-display (Inter weighted), font-mono (JetBrains Mono) — consistent",
+        "glass_panels": ".glass-panel and .glass-panel-strong — consistent borders, backgrounds, shadows, backdrop-blur"
+      },
+      "drift_detected": "ai-awakening page (src/app/ai-awakening/page.tsx) uses hardcoded colors (#050505, #fff, #888, #666) instead of CSS variables, and lacks Header integration. This page is NOT part of the Phase 8 deliverable (it's route 15/15) but represents design system drift."
+    },
+    "6_fixes_applied_correctly": {
+      "status": "PASS",
+      "fix_1_duplicate_footer": {
+        "description": "Contact page had inline <footer> removed",
+        "verified": true,
+        "detail": "src/app/contact/page.tsx: no inline <footer> element present. Page relies on layout.tsx Footer like all other pages. Previous lines 262-269 cleanly removed."
+      },
+      "fix_2_main_content_ids": {
+        "description": "7 pages had id=\"main-content\" added to <main>",
+        "verified": true,
+        "pages_checked": [
+          { "page": "About", "line": 17, "has_id": true },
+          { "page": "Contact", "line": 57, "has_id": true },
+          { "page": "Fenix Plus SA", "line": 16, "has_id": true },
+          { "page": "DocVault", "line": 38, "has_id": true },
+          { "page": "CodexPilot", "line": 38, "has_id": true },
+          { "page": "Field Ops", "line": 39, "has_id": true },
+          { "page": "0Brain", "line": 38, "has_id": true }
+        ],
+        "additional_note": "Pages that already had id=\"main-content\" before the fix (Home, Work, Capabilities, Approach, Lab, Lab/[slug]) confirmed still in place."
+      },
+      "fix_3_404_colors": {
+        "description": "404 page hardcoded hex colors replaced with CSS variables",
+        "verified": true,
+        "replacements": [
+          { "was": "#070808", "now": "var(--color-bg)" },
+          { "was": "#E2E4E9", "now": "var(--color-text)" },
+          { "was": "#5B5F68", "now": "var(--color-muted)" },
+          { "was": "#8A8F98", "now": "var(--color-muted)" },
+          { "was": "font-sans", "now": "font-body" }
+        ]
+      }
+    }
+  },
+  "issues_found_beyond_audit": [
+    {
+      "id": "JUDGE-001",
+      "severity": "HIGH",
+      "category": "Navigation — Broken links",
+      "description": "Home page Lab preview generates wrong slugs for 2 experiments: 'multi-format-document-understanding' (should be 'document-understanding-pipeline') and 'android-native-coding-agent' (should be 'android-coding-agent'). Both result in 404.",
+      "location": "src/app/page.tsx lines 198-210",
+      "fix": "Either change Home page experiment slugs to match lab/[slug] keys, or change lab/[slug] keys to match Home page. Also consider using the experiments data as a shared source rather than duplicating the list."
+    },
+    {
+      "id": "JUDGE-002",
+      "severity": "LOW",
+      "category": "Navigation — Self-link",
+      "description": "Fenix Plus SA page has a 'Project details' button that links to /work/fenix-plus-sa — the current page.",
+      "location": "src/app/work/fenix-plus-sa/page.tsx line 38",
+      "fix": "Remove the button or change it to navigate somewhere useful (e.g. back to /work)."
+    },
+    {
+      "id": "JUDGE-003",
+      "severity": "LOW",
+      "category": "Design system — ai-awakening drift",
+      "description": "The ai-awakening page uses hardcoded colors (#050505, #fff, #888, #666) instead of CSS variables, and lacks id=\"main-content\" on its <main> element.",
+      "location": "src/app/ai-awakening/page.tsx",
+      "fix": "Replace hardcoded colors with var(--color-bg), var(--color-text), var(--color-muted), and add id=\"main-content\". Note: this page is NOT part of the Phase 8 deliverable (15th route)."
+    },
+    {
+      "id": "JUDGE-004",
+      "severity": "LOW",
+      "category": "Accessibility",
+      "description": "The 404 page (not-found.tsx) does not use <main id=\"main-content\"> — it uses a plain <div> as root. The skip-to-content link in layout.tsx will have no target on 404 pages.",
+      "location": "src/app/not-found.tsx line 13",
+      "fix": "Consider wrapping content in <main id=\"main-content\"> or accept that 404 pages intentionally skip the shell."
+    }
+  ],
+  "audit_accuracy_assessment": {
+    "correct_findings": [
+      "Duplicate footer on Contact page — correctly identified and fixed",
+      "7 pages missing main-content IDs — correctly identified and fixed",
+      "404 hardcoded colors — correctly identified and fixed",
+      "Shared elements consistent across pages",
+      "Distinct content per page",
+      "Design system correctly applied"
+    ],
+    "missed_by_audit": [
+      "2 broken experiment-slug links on Home page (HIGH severity)",
+      "Self-referential link on Fenix Plus SA page (LOW severity)",
+      "ai-awakening page design system drift (LOW, out of scope)"
+    ],
+    "audit_grade": "B+ — correctly identified and fixed the 3 systemic issues, but missed 2 navigation bugs that will produce user-facing 404s"
+  }
+}

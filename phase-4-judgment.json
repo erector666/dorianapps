@@ -1,0 +1,244 @@
+{
+  "judgment": "PHASE 4 — ASSET CREATION ADVERSARIAL JUDGMENT",
+  "timestamp": "2026-07-20",
+  "overall_verdict": "PARTIAL_PASS_WITH_CRITICAL_GAPS",
+  "overall_score": "47/100",
+  "summary": "Four generated assets exist and are technically valid, but the logo catastrophically violates the Phase 3 spec, source traceability is absent, and screenshot 'verification' is superficial. The builder hero image meets dimensional and size requirements but lacks pairing evidence. No P0 monogram mark (AS-035) or favicon redesign (AS-037) exists. This is a pass for existence but a fail for specification compliance.",
+
+  "checks": {
+    "1_generated_assets_exist": {
+      "verdict": "PASS",
+      "score": "10/10",
+      "details": {
+        "the-builder.webp": { "exists": true, "path": "/root/dorianapps/public/assets/the-builder.webp" },
+        "the-builder-mobile.webp": { "exists": true, "path": "/root/dorianapps/public/assets/the-builder-mobile.webp" },
+        "hero-diagram.svg": { "exists": true, "path": "/root/dorianapps/public/assets/hero-diagram.svg" },
+        "logo.svg": { "exists": true, "path": "/root/dorianapps/public/assets/logo.svg" }
+      }
+    },
+
+    "2_source_traceability": {
+      "verdict": "FAIL",
+      "score": "2/15",
+      "findings": [
+        "NO generation manifest, prompt log, or provenance file found anywhere in the repository",
+        "NO tool output trail — no record of which image_generate prompts were used, parameters, or generation session IDs",
+        "NO documented processing steps (center-crop params, LANCZOS upscale parameters, etc.)",
+        "LICENSE.md at /root/dorianapps/public/assets/LICENSE.md only contains high-level categories ('Generated via AI image generation — original') with zero specificity",
+        "Neither WebP file contains EXIF metadata or custom XMP/comment fields tracing their origin",
+        "The Phase 4 context description ('generated via Mistral FLUX, then Python/Pillow center-crop + LANCZOS') exists only in the task delegation context — it is NOT documented in any repo file",
+        "A future developer opening this repo would have NO WAY to know how these assets were produced, what prompts created them, or how to regenerate them",
+        "SVG files contain no metadata comments, author attribution, or generation notes"
+      ],
+      "recommendation": "Create /root/dorianapps/docs/asset-generation-log.md or /root/dorianapps/public/assets/MANIFEST.md with: generation tool, model, prompt used, post-processing steps, date, and operator"
+    },
+
+    "3_paired_image_consistency": {
+      "verdict": "WEAK_PASS",
+      "score": "7/15",
+      "findings": [
+        "Bhattacharyya coefficients: R=0.968, G=0.947, B=0.925 — suggests shared color palette characteristics but not identical processing",
+        "Mean color distance (resized): 27.6 — desktop is darker (RGB 12,20,30) vs mobile (RGB 29,34,46)",
+        "Desktop std dev ratios (mobile/desktop): R=1.68, G=1.17, B=0.97 — mobile has significantly higher red channel variance, suggesting different framing/composition",
+        "Desktop is 2560×1440 (landscape 16:9), mobile is 750×1334 (portrait 9:16) — mathematically impossible for mobile to be a simple center-crop of desktop",
+        "Both lack EXIF/ICC metadata — no way to confirm they share generation origin",
+        "Colorspace: both RGB, no ICC profiles embedded",
+        "The spec requires 'same scene' with different framing — without vision analysis (tool failure), we cannot confirm this visually. The Bhattacharyya data weakly supports shared provenance but the red variance difference is suspicious.",
+        "Mobile file (43 KB) is 44% of desktop size (94 KB) — compression ratio is reasonable but doesn't prove shared origin"
+      ],
+      "risk": "May be from two different generation runs with different prompts, producing visually inconsistent hero + mobile pairing"
+    },
+
+    "4_asset_compression": {
+      "verdict": "PASS_FOR_GENERATED_FAIL_FOR_SCREENSHOTS",
+      "score": "8/15",
+      "generated_assets": {
+        "the-builder.webp": {
+          "size_bytes": 96564,
+          "size_kb": 94.3,
+          "spec_max_kb": 180,
+          "utilization": "52%",
+          "verdict": "PASS — well under budget"
+        },
+        "the-builder-mobile.webp": {
+          "size_bytes": 43894,
+          "size_kb": 42.9,
+          "spec_max_kb": 80,
+          "utilization": "54%",
+          "verdict": "PASS — well under budget"
+        },
+        "hero-diagram.svg": {
+          "size_bytes": 11523,
+          "size_kb": 11.3,
+          "spec_max_kb": 15,
+          "utilization": "75%",
+          "verdict": "PASS — under budget but tight"
+        },
+        "logo.svg": {
+          "size_bytes": 1850,
+          "size_kb": 1.8,
+          "spec_max_kb": 3,
+          "utilization": "60%",
+          "verdict": "PASS — under budget"
+        }
+      },
+      "screenshot_oversize_issues": [
+        "docvault.png: 499.7 KB vs 200 KB spec limit (250% over)",
+        "fenix-live-map.png: 1,678.6 KB vs 200 KB spec limit (839% over — 8.4× budget!)",
+        "fenix-login.png: 146.1 KB vs 60 KB spec limit (244% over)",
+        "0brain-dashboard.png: 914.0 KB vs 200 KB spec limit (457% over)"
+      ],
+      "note": "Generated assets are appropriately compressed at reasonable WebP quality. Pre-existing screenshots are grossly over-budget and need re-compression/re-sizing to meet Phase 3 spec targets."
+    },
+
+    "5_mobile_variant": {
+      "verdict": "PASS",
+      "score": "8/10",
+      "findings": [
+        "the-builder-mobile.webp exists at 750×1334 matching AS-001-M spec dimensions exactly",
+        "Aspect ratio 0.562 matches the 9:16 portrait target",
+        "File is 42.9 KB, comfortably under 80 KB target",
+        "Correct orientation: portrait (different from desktop's landscape)",
+        "Content from a different crop is not visually confirmed (vision tool failure) but dimensions prove it's not a simple resize",
+        "The spec requires the mobile crop to focus on 'hands and screens' — without vision analysis this cannot be verified"
+      ]
+    },
+
+    "6_licensing": {
+      "verdict": "WEAK_PASS",
+      "score": "6/15",
+      "generated_assets": {
+        "the-builder.webp": "Claimed: generated (owned). No provenance evidence. Cannot prove it's not an AI generation of copyrighted derivative work.",
+        "the-builder-mobile.webp": "Same as above.",
+        "hero-diagram.svg": "Claimed: hand-crafted. Content appears original — no copied paths or embedded copyrighted material detected. However, no author assertion of originality in file comments.",
+        "logo.svg": "Claimed: original creation. Uses Helvetica Neue font family reference — Helvetica is commercially licensed (not OFL). Spec requires Switzer (OFL). This font reference creates a licensing ambiguity."
+      },
+      "screenshot_verification_gaps": [
+        "codexpilot-mockup.png, codexpilot-mockup-2.png: named 'mockup' — explicitly NOT verified captures. Spec requires these be marked 'prototype' if not real. No such labeling found in file or metadata.",
+        "codexpilot-screen-3.png: ambiguous name — could be mockup or capture. No verification evidence.",
+        "0brain-dashboard.png: No evidence this is a live dashboard capture vs a generated mockup. Spec says 'If 0Brain is deployed: capture from live dashboard.' No deployment verification performed.",
+        "fenix-live-map.png: claimed as 'verified existing screenshot' but spec says only REUSE AS-IS 'IF verified current'. No verification evidence (timestamp, build number, live URL check).",
+        "docvault.png: claimed as verified, but dimensions (1440×1000) don't match spec target (2400×1650) — suggesting it may be a low-res capture, not the required 2× resolution capture."
+      ],
+      "note": "LICENSE.md correctly asserts ownership. The gap is in PROOF, not assertion. Without generation trails, any third party could challenge these as unlicensed derivations."
+    },
+
+    "7_no_generation_defects": {
+      "verdict": "PARTIAL_PASS",
+      "score": "6/10",
+      "svg_validation": {
+        "hero-diagram.svg": {
+          "valid_xml": true,
+          "viewBox": "0 0 1200 600",
+          "spec_viewBox": "1200 × 600",
+          "match": true,
+          "issues": [
+            "Uses <filter> with feGaussianBlur — GSAP stroke-dashoffset animation spec references but no animation markup present",
+            "BEFORE/AFTER are hardcoded side-by-side — spec calls for 'Two-state SVG' with scroll-driven transition between states. Both states rendered simultaneously defeats the interaction concept.",
+            "Spec says 'Desktop: horizontal layout (chaos left, resolution right)' — this IS the layout but missing the transition mechanism",
+            "Spec says 'Mobile: vertical (chaos top, resolution bottom)' — no CSS media query or mobile layout detected in the SVG",
+            "Missing GSAP ScrollTrigger integration entirely (no data attributes, no JS hooks, no animation markers)"
+          ]
+        },
+        "logo.svg": {
+          "valid_xml": true,
+          "viewBox": "0 0 400 100",
+          "spec_viewBox": "240 × 40",
+          "match": false,
+          "issues": [
+            "CRITICAL: viewBox ratio is 4:1. Spec AS-036 requires 240×40 (6:1 ratio). Wrong aspect for the brand lockup.",
+            "CRITICAL: Uses Helvetica Neue. Spec requires Switzer Medium 500. Font-family mismatch.",
+            "CRITICAL: Contains gradients (logoGrad, accentGrad). Spec AS-036 explicitly states 'No gradient.' AS-035 says 'currentColor, no gradients.'",
+            "CRITICAL: Contains amber accent dot with glow filter. Spec says 'No accent dot.'",
+            "CRITICAL: Contains 'APPS' sub-text. Spec defines wordmark as 'DORIAN' only.",
+            "CRITICAL: Uses font-weight 300 (light). Spec says Switzer Medium 500.",
+            "CRITICAL: Contains separator line with amber gradient. Not in spec.",
+            "The logo is essentially the OLD logo restyled — not the specified geometric D/A interlocking monogram.",
+            "AS-035 (D/A Monogram Mark, 64×64, standalone mark) is ENTIRELY MISSING — this is a P0 critical path asset per spec §17."
+          ]
+        }
+      },
+      "image_defects": {
+        "the-builder.webp": "Dimensions (2560×1440) match spec. No visible defects detected from structural analysis (valid WebP VP8X header). Content defects (AI artifacts, hands visible) cannot be assessed due to vision tool failure.",
+        "the-builder-mobile.webp": "Dimensions (750×1334) match spec. Valid WebP format."
+      },
+      "screenshot_dimension_fails": [
+        "docvault.png: 1440×1000 vs spec 2400×1650 (60% undersized)",
+        "fenix-live-map.png: 1907×863 vs spec 2400×1650 (mismatched aspect + undersized)",
+        "fenix-login.png: 1917×872 vs spec 720×480 (2.7× too large)",
+        "codexpilot-mockup.png: 226×512 vs spec 2400×1650 (phone-sized, 10× undersized width)",
+        "codexpilot-screen-3.png: 226×512 — same issue",
+        "0brain-dashboard.png: 1912×875 vs spec 2400×1650 (undersized)"
+      ]
+    },
+
+    "8_missing_assets": {
+      "verdict": "CRITICAL_GAPS",
+      "critical_missing": [
+        {
+          "asset_id": "AS-035",
+          "name": "D/A Monogram Mark",
+          "priority": "P0 — Critical Path per spec §17",
+          "spec": "64×64 viewBox, geometric D/A interlocking monogram, currentColor, no gradients, monochrome",
+          "status": "NOT FOUND anywhere in /root/dorianapps/public/assets/"
+        },
+        {
+          "asset_id": "AS-037",
+          "name": "Favicon (redesign)",
+          "priority": "P0 — Critical Path per spec §17",
+          "spec": "Same geometry as AS-035 on dark rounded-rect background. No orange/gold gradient. Off-white mark on #070808.",
+          "status": "OLD favicon.svg still present at /root/dorianapps/public/favicon.svg — uses orange/gold gradient, Playfair Display serif 'DA', circular background. Spec requires complete replacement."
+        }
+      ],
+      "note": "Spec §17 lists AS-001, AS-018, AS-035, AS-036, AS-037 as P0 Critical Path. Phase 4 produced AS-001, AS-018, and AS-036 (logo.svg). AS-035 and AS-037 are unaddressed, blocking the homepage rebuild."
+    },
+
+    "9_logo_spec_compliance": {
+      "verdict": "CATASTROPHIC_FAIL",
+      "score": "0/10",
+      "spec_violations": {
+        "AS-036_viewBox": "Expected 240×40 (6:1 ratio). Got 400×100 (4:1 ratio).",
+        "AS-036_font": "Expected Switzer Medium 500. Got Helvetica Neue, weight 300.",
+        "AS-036_gradient": "Expected NO gradients. Got 2 linearGradient definitions (logoGrad, accentGrad).",
+        "AS-036_accent_dot": "Expected NO accent dot. Got amber dot with glow filter.",
+        "AS-036_wordmark_text": "Expected 'DORIAN' only. Got 'DORIAN' + 'APPS' sub-text.",
+        "AS-036_letter_spacing": "Expected 0.15em on wordmark. Got 'letter-spacing=\"2\"' (unitless).",
+        "AS-036_separator": "Expected none. Got amber gradient separator line.",
+        "AS-035_monogram": "Expected geometric D/A interlocking monogram (currentColor, single weight, architectural). Got overlapping D and A text elements with slash separator.",
+        "AS-035_standalone": "File does not exist. No way to use the mark independently."
+      }
+    }
+  },
+
+  "phase_3_scope_gap": {
+    "verdict": "Only 4 of 59+ CREATE/REVISE assets addressed",
+    "total_spec_assets": 73,
+    "generated_in_phase_4": 4,
+    "reused_unchanged_in_phase_4": 7,
+    "unaddressed": 62,
+    "critical_unaddressed": [
+      "AS-002 through AS-006: 5 photorealistic hero scenes for product sections (P2)",
+      "AS-007 through AS-014: Product screenshots — noted as 'verified existing' but many fail dimension/size specs (P1)",
+      "AS-019 through AS-026: System diagrams (P3)",
+      "AS-027 through AS-034: Icon sets (P4)",
+      "AS-038, AS-039: Social preview images (P5)",
+      "AS-045 through AS-051: Mobile crop variants (P5)",
+      "AS-052 through AS-054: Fallback images (P5)",
+      "AS-058, AS-059: 404 graphic + preloader revision (P5)"
+    ]
+  },
+
+  "recommendations": [
+    "REBUILD logo.svg from scratch per AS-035 + AS-036 spec: geometric D/A monogram at 64×64 plus lockup at 240×40, Switzer Medium 500, no gradients, no accent dot, no 'APPS' sub-text, currentColor support",
+    "CREATE AS-035 as separate monogram mark SVG (critical path blocker)",
+    "REDESIGN favicon.svg per AS-037 — derived from new AS-035 geometry, not the current orange/gold gradient design",
+    "CREATE asset-generation-log.md documenting: tool (Mistral FLUX), model (flux-pro), full prompts, processing scripts, date, operator for every generated asset",
+    "ADD XMP/comment metadata to SVG files with author and generation method",
+    "RE-COMPRESS all screenshots to meet spec budget targets (especially fenix-live-map.png at 8.4× over budget)",
+    "RESIZE screenshots to match spec target dimensions or document deviation rationale",
+    "LABEL CodexPilot mockups as 'prototype' per AS-011/AS-012 spec requirements",
+    "VERIFY 0Brain dashboard is from a live deployment (or label as generated mockup)",
+    "ADD GSAP ScrollTrigger integration markers to hero-diagram.svg or split into two separate state SVGs as the spec describes",
+    "GENERATE remaining P1/P2 assets before homepage rebuild can be considered complete"
+  ]
+}

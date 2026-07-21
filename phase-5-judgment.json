@@ -1,0 +1,312 @@
+{
+  "judgment": "PHASE 5 — IMPLEMENTATION PLAN ADVERSARIAL JUDGMENT",
+  "timestamp": "2026-07-20",
+  "overall_verdict": "PASS_WITH_GAPS",
+  "overall_score": "72/100",
+  "summary": "The plan is thorough in structure and covers all major implementation dimensions. However, it has a critical blind spot: 13 existing components that use deprecated CSS classes are completely unaccounted for. The plan's data model changes claim to update identity.label to a value already present in site.ts, indicating staleness or circularity. Several assets referenced for product page updates don't actually exist, and the hero diagram animation approach specifies inline SVG but references external SVG files. The plan would benefit from an explicit 'DO NOT TOUCH' list and must reconcile its animation architecture with the actual split-SVG asset format.",
+
+  "checks": {
+    "1_file_creation_completeness": {
+      "verdict": "PASS_WITH_GAPS",
+      "score": "13/15",
+      "details": {
+        "total_listed": 48,
+        "actual_count_verified": 48,
+        "issues": [
+          "SectionDivider.tsx is DOUBLE-COUNTED: listed as NEW file #31 (src/components/shared/SectionDivider.tsx) AND as MODIFY file #24 (existing at src/components/SectionDivider.tsx). The plan creates a shared/ variant without addressing whether the existing non-shared file should be moved or duplicated.",
+          "No creation entries for ContentSection.tsx's actual implementation — listed in component map (Section 4.10) but its file path is never specified in the creation table.",
+          "diagrams/ directory does not exist — entries #43-48 list 'public/assets/diagrams/*.svg' as new files but this is an entire subdirectory, not individual files. The plan should enumerate specific filenames: agent-architecture.svg, method-process.svg, docvault-architecture.svg, fieldops-architecture.svg, plus two unspecified."
+        ],
+        "strengths": [
+          "Every page route has a corresponding file creation entry with clear purpose",
+          "Components are organized by page/domain — clear scoping",
+          "Data files, utility files, and test files are all accounted for"
+        ]
+      }
+    },
+
+    "2_file_modification_completeness": {
+      "verdict": "FAIL",
+      "score": "8/20",
+      "details": {
+        "listed_modifications": 43,
+        "critical_blind_spot": "13 existing components are COMPLETELY UNACCOUNTED FOR — they use deprecated CSS classes (flow-shell, site-shell, experience-container, etc.) and will visually break or throw errors when globals.css is rewritten. The plan neither deprecates nor modifies them:",
+        "unaccounted_components": [
+          "WorkSection.tsx — uses flow-shell wrapper, old CSS classes, referenced on homepage",
+          "CasePage.tsx — used by product pages, uses site-shell wrapper, old CSS tokens",
+          "ContactSection.tsx — uses glass-panel-strong, old gradient backgrounds, Playfair font references",
+          "ProductShowcase.tsx — references products data with old tokens, flow-shell styling",
+          "ProcessSection.tsx — references old process array (to be removed from site.ts), old CSS classes",
+          "ProductScreenPortal.tsx — uses @react-three/fiber (Three.js), will break if Three.js removed",
+          "StatCounter.tsx — references old metrics data structure",
+          "Marquee.tsx — used on homepage (or about page), references old CSS variables",
+          "HomeHero.tsx — uses flow-hero CSS classes being deprecated",
+          "FadeIn.tsx — uses GSAP/Framer Motion, may still work but not assessed",
+          "RevealText.tsx — uses animation patterns, not assessed for Systematic compatibility",
+          "AccentProvider.tsx — manages --accent-hue and --accent-hex CSS vars; plan rewrites accent system without addressing this provider",
+          "ToolkitSection.tsx — references toolkit array being removed from site.ts"
+        ],
+        "data_staleness": [
+          "site.ts line 5 ALREADY has identity.label = 'AI product builder and autonomous-agent systems developer' — the plan's data model section (5.1) proposes this as a change but the value already matches. This suggests the plan was written against a different codebase state, or site.ts was already partially updated outside the phase sequence.",
+          "site.ts metrics array (lines 10-14) already has values close to the plan's proposed values (plan proposes {4,5,10+}; actual has {5,7,24/7}). The plan correctly identifies this as needing update, but 'metrics[2].label' = 'Real-world operator mindset' — the plan's proposed 'Years operational experience' is a different metric, not a rename."
+        ],
+        "path_accuracy_issues": [
+          "Plan line 435 says 'docvault.image → /assets/screenshots/docvault.png ✓ already correct' — this IS correct in site.ts line 51.",
+          "Plan line 435 says 'codexpilot.image → /assets/screenshots/codexpilot-mockup.png (AS-011)' but site.ts line 71 currently has '/assets/3.jfif'. The plan correctly identifies the change needed, but the formatting implies some of these are 'already correct' when they aren't. Also codexpilot-mockup.png is only 226×512 — 10× undersized per Phase 3 spec.",
+          "Plan line 436 says '0brain.image → /assets/screenshots/0brain-dashboard.png ✓ already correct' — site.ts line 112 has '/assets/3.jfif' for 0brain, NOT 0brain-dashboard.png. This is WRONG in the plan."
+        ],
+        "strengths": [
+          "Layout, CSS, Tailwind config modifications are correctly identified",
+          "Deprecated component list (16 items) is comprehensive for the AI Awakening aesthetic",
+          "Test file modifications are well-specified"
+        ]
+      }
+    },
+
+    "3_dependencies_and_rationale": {
+      "verdict": "PASS_WITH_WEAKNESSES",
+      "score": "12/15",
+      "details": {
+        "packages_to_add": ["@fontsource/switzer (latest)"],
+        "packages_to_remove": ["@react-three/drei", "@react-three/fiber", "three", "@types/three"],
+        "packages_kept": ["framer-motion", "gsap", "@studio-freight/lenis", "split-type", "next", "react", "react-dom", "tailwindcss"],
+        "issues": [
+          "Switzer is NOT available on @fontsource — it's an Indian Type Foundry (ITF) commercial font, not a Google Font or Fontsource-published font. The plan correctly flags this as Risk #1 but the package recommendation is wrong. The correct approach is self-hosted font files via next/font/local, not a npm package.",
+          "Three.js removal is listed as 'optional' with a note to keep deps but remove imports. This is a reasonable conservative approach but adds confusion: the plan's CSS section says to remove Three.js-related CSS classes entirely, yet the package stickiness means stale code could still bundle Three.js via tree-shaking misses.",
+          "No mention of whether @types/gsap is still needed — GSAP v3 ships its own types. This is minor."],
+        "strengths": [
+          "Clear rationale for each kept package (Framer Motion for Tier 1, GSAP for Tier 2/3, Lenis for smooth scroll)",
+          "Correctly identifies that no additional animation packages are needed",
+          "~500KB savings from Three.js removal is quantified"
+        ]
+      }
+    },
+
+    "4_animation_approach_specificity": {
+      "verdict": "PASS_WITH_CRITICAL_RECONCILIATION_GAP",
+      "score": "11/15",
+      "details": {
+        "tier_1": "Fully specified — every interaction mapped to component, duration, easing, and library.",
+        "tier_2": "Fully specified — scroll triggers, scrub values, stagger timing documented per animation type.",
+        "tier_3_signature": "Well-described conceptually — chaos→resolution transition with stroke-dashoffset, scroll-driven at ~2.5s.",
+        "critical_gap": "ARCHITECTURE-ASSET MISMATCH: The plan specifies 'Inline SVG with two <g> groups. before-group visible, after-group hidden' in HeroDiagram.tsx (Section 9.3). However, the actual Phase 4 assets are three SEPARATE external SVG files (hero-diagram.svg at 1200×600 composite, hero-diagram-before.svg at 600×600 standalone, hero-diagram-after.svg at 600×600 standalone). The 600×600 split files don't match the specified 'Desktop: Horizontal layout — chaos left, resolution right' — they are square-orientation individual states. The plan does not specify HOW the split external SVGs become an inline manipulable two-state diagram in React. Either: (a) the SVGs need to be embedded as inline JSX, or (b) the animation approach needs to crossfade between two separate <img> elements, which fundamentally changes the scroll-driven stroke-dashoffset and position-tweening approach described.",
+        "gsap_fm_separation": "Well-specified — strict separation (GSAP for scroll-driven, FM for state-driven) with no property overlap. However, the plan doesn't address that GSAP ScrollTrigger scrubs CSS custom properties (--accent-active) which also influence FM-animated elements. Potential for jank if both libraries read/write the same CSS vars.",
+        "reduced_motion": "Fully documented — GSAP ScrollTrigger not created, FM transitions zeroed, marquee paused, CSS override present."
+      }
+    },
+
+    "5_accessibility_approach": {
+      "verdict": "PASS_WITH_MINOR_GAPS",
+      "score": "13/15",
+      "details": {
+        "skip_links": "Addressed — existing skip link in layout.tsx, plan extracts to SkipLink component. Styling specified.",
+        "focus_order": "Documented as ordered list for entire page flow.",
+        "contrast": "Excellent — every color combination listed with computed WCAG ratio and pass/fail verdict. Violet and tertiary text correctly flagged with usage restrictions.",
+        "reduced_motion": "Comprehensive — CSS override + GSAP conditional creation + FM zero-duration + marquee pause.",
+        "aria_labels": "Element-by-element table covering nav, diagrams, form inputs, status badges, breadcrumbs.",
+        "keyboard": "Covered — Escape for mobile menu, tab order matches visual order, no keyboard traps.",
+        "gaps": [
+          "No mention of ARIA-live regions for dynamic content (e.g., status filter on lab page, form validation errors that appear asynchronously)",
+          "No mention of screen reader testing or compatibility validation (NVDA, VoiceOver, JAWS)",
+          "SVG diagram aria-labels say '[Diagram description]' as placeholder — actual descriptive text not specified",
+          "Heading hierarchy not explicitly documented (h1→h2→h3 per page), though testing plan checks for it"
+        ]
+      }
+    },
+
+    "6_performance_risks": {
+      "verdict": "PASS_WITH_GAPS",
+      "score": "11/15",
+      "details": {
+        "risks_identified": 12,
+        "honest_assessment": true,
+        "high_impact_risks_captured": [
+          "CSS consolidation breaks existing styles (HIGH likelihood, HIGH impact)",
+          "Stale imports cause build failure (HIGH likelihood, MEDIUM impact)",
+          "GSAP+ScrollTrigger+Lenis integration breakage (MEDIUM likelihood, HIGH impact)",
+          "Violet accent WCAG AA failure (HIGH likelihood, MEDIUM impact)",
+          "Switzer font loading failure (MEDIUM likelihood, HIGH impact)"
+        ],
+        "missing_risks": [
+          "CLS (Cumulative Layout Shift) from font swap — Switzer replacing Inter/Playfair will reflow text if not handled with font-size-adjust or fallback font metric matching",
+          "SVG animation paint costs — scroll-driven stroke-dashoffset on multiple diagrams simultaneously can trigger expensive repaints, especially on mobile",
+          "LCP competition — hero diagram + builder webp image loading simultaneously on hero section; both are LCP candidates. Needs explicit priority/size hints",
+          "WebP compatibility on older Safari (pre-14) — no <picture> fallback mentioned for the builder image",
+          "Next.js 16 + React 19 compatibility with GSAP/Lenis — these packages may not have been tested against this version combo. Plan doesn't mention version regression testing"
+        ],
+        "mitigation_quality": "Risk mitigations are realistic (test early, ImageWithFallback, Vercel rollback, tree-shaking). However, the CSS consolidation risk (#2) has a circular dependency: 'update ALL pages before removing CSS classes' is a chicken-and-egg problem — pages can't be updated to new CSS until new CSS exists, and global.css can't be rewritten without knowing which classes are still used."
+      }
+    },
+
+    "7_mobile_behavior_plan": {
+      "verdict": "PASS",
+      "score": "14/15",
+      "details": {
+        "breakpoints": "4 breakpoints specified (mobile <640, tablet 640-1023, desktop ≥1024, wide ≥1280) with layout changes described per breakpoint.",
+        "per_page_layout": "All 9 page types have desktop → tablet → mobile layout progression documented in table (Section 10.2).",
+        "mobile_navigation": "Fully specified — hamburger trigger (44×44px touch target), slide-from-right drawer, glass background, 44px link heights, swipe-to-close, Escape key, AnimatePresence.",
+        "typography": "clamp()-based fluid scaling eliminates breakpoint-specific overrides — elegant approach.",
+        "images": "next/image with sizes/srcSet, <picture> for hero builder desktop/mobile swap.",
+        "diagram_mobile": "Hero diagram: vertical stack (chaos top, resolution bottom) with tap-to-toggle fallback. Good.",
+        "gap": "No mention of touch-friendly spacing for interactive elements (e.g., product card links needing sufficient tap target separation, not just size)."
+      }
+    },
+
+    "8_blast_radius_assessment": {
+      "verdict": "PASS",
+      "score": "14/15",
+      "details": {
+        "change_impact_matrix": "13 changes assessed for systems/data/users/severity — comprehensive.",
+        "dependency_graph": "10-step implementation order with dependency arrows — clear and actionable.",
+        "rollback_per_change": "7 rollback scopes documented per failure scenario — pragmatic.",
+        "severity_ratings": [
+          "HIGH: CSS consolidation, homepage rebuild, design token rewrite (correct — foundational)",
+          "MEDIUM: Font replacement, nav restructure, SEO metadata (correct)",
+          "LOW: New pages, product page updates, Three.js removal, contact form, 404 fix, test suite, ai-awakening deletion (correct)"
+        ],
+        "gap": "The blast radius matrix doesn't account for the 13 unaccounted components (see check #2). If any of those are still imported by live pages, the 'systems affected' column understates the blast radius of the CSS consolidation change."
+      }
+    },
+
+    "9_areas_not_to_touch": {
+      "verdict": "FAIL",
+      "score": "3/10",
+      "details": {
+        "explicit_do_not_touch_list": "NONE — the plan has no dedicated 'DO NOT MODIFY' or 'PRESERVE AS-IS' section.",
+        "implicitly_preserved": [
+          "ImageWithFallback.tsx — listed as 'No changes needed' (line 145) ✓",
+          "ErrorBoundary.tsx — not mentioned at all, but is imported in layout.tsx",
+          "SmoothScroll.tsx — listed for modification (Lenis integration verification)",
+          "Contact form validation logic — plan adds fields but doesn't specify preserving validation pattern"
+        ],
+        "should_be_explicitly_preserved_but_arent": [
+          "Existing external URLs (docvault.dev, fenixplus.ch) — any accidental change breaks product linking",
+          "CaseItem type's existing fields — plan adds status field but doesn't warn against removing or renaming existing fields",
+          "Playwright E2E tests (if any exist) — not mentioned, could be broken by nav restructuring",
+          "Vercel configuration (vercel.json) — not mentioned, but route changes might need redirectRules updates",
+          "Existing favicon.ico (if any) alongside favicon.svg — browser fallback behavior",
+          "next.config — not mentioned, but could contain image domains or redirects that need updating"
+        ],
+        "why_this_matters": "Without an explicit 'don't touch' contract, Phase 6 implementers could accidentally modify critical infrastructure files (next.config, vercel.json, CaseItem type signature) that the plan assumes are stable. The 13 unaccounted components also sit in a gray zone — are they to be touched or not?"
+      }
+    },
+
+    "10_feasibility_asset_reference_check": {
+      "verdict": "PASS_WITH_MISSING_ASSETS",
+      "score": "10/15",
+      "details": {
+        "assets_that_exist": [
+          "the-builder.webp ✓ (2560×1440, 94.3 KB)",
+          "the-builder-mobile.webp ✓ (750×1334, 42.9 KB)",
+          "hero-diagram.svg ✓ (1200×600 composite, 11.5 KB)",
+          "hero-diagram-before.svg ✓ (600×600 split BEFORE state)",
+          "hero-diagram-after.svg ✓ (600×600 split AFTER state)",
+          "logo.svg ✓ (480×80, rebuilt per AS-036 spec, D/A monogram + DORIAN wordmark, no gradients)",
+          "da-monogram.svg ✓ (64×64, AS-035 spec, currentColor, interlocking D/A)",
+          "favicon.svg ✓ (64×64, rebuilt per AS-037, da-monogram on #070808 rounded-rect)",
+          "docvault.png ✓ (1440×1000, but 60% undersized per Phase 3 spec)",
+          "0brain-dashboard.png ✓ (1912×875, undersized)",
+          "codexpilot-mockup.png ✓ (226×512 — phone-sized, 10× undersized)",
+          "codexpilot-mockup-2.png ✓",
+          "fenix-live-map.png ✓ (1907×863, undersized + 8.4× over budget)",
+          "fenix-login.png ✓ (1917×872)",
+          "portrait-1.webp ✓, portrait-2.webp ✓, portrait-3.webp ✓",
+          "og-image.svg ✓, preloader.svg ✓"
+        ],
+        "assets_referenced_but_missing": [
+          "docvault-query.png — referenced at plan line 435 and section 7.2. Does NOT exist in public/assets/screenshots/.",
+          "0brain-memory-trace.png — referenced at plan line 439 and section 7.2. Does NOT exist.",
+          "fenix-plus-sa-preview.png — referenced at plan line 442 and section 7.2. Does NOT exist.",
+          "method-workspace.webp — referenced at section 7.2 (AS-016). Does NOT exist.",
+          "document-intelligence.webp — referenced at section 7.2 (AS-002). Does NOT exist.",
+          "field-operations.webp — referenced at section 7.2 (AS-003). Does NOT exist.",
+          "agent-orchestration.webp — referenced at section 7.2 (AS-004). Does NOT exist.",
+          "mobile-development.webp — referenced at section 7.2 (AS-005). Does NOT exist.",
+          "ai-memory-system.webp — referenced at section 7.2 (AS-006). Does NOT exist.",
+          "workshop-still-revised.webp — referenced at section 7.2 (AS-017). Does NOT exist.",
+          "diagrams/agent-architecture.svg (AS-019) — Does NOT exist.",
+          "diagrams/method-process.svg (AS-021) — Does NOT exist.",
+          "diagrams/docvault-architecture.svg (AS-022) — Does NOT exist.",
+          "diagrams/fieldops-architecture.svg (AS-023) — Does NOT exist.",
+          "0brain-loop-violet.svg (AS-020) — Does NOT exist."
+        ],
+        "plan_honesty": "The plan acknowledges most missing diagram/assets as 'to generate in Phase 6' (Section 7.2), which is honest. However, the product page modification entries (Section 2.3, items 12-15) say 'Update hero image paths to Phase 4 assets' without caveat that those Phase 4 assets (AS-002 through AS-005) don't exist yet. The implementer would discover this at build time.",
+        "data_path_errors": "Plan says 0brain.image is '/assets/screenshots/0brain-dashboard.png' and 'already correct' (line 438). Reality: site.ts line 112 has '/assets/3.jfif' for 0brain. This is factually wrong."
+      }
+    }
+  },
+
+  "summary_of_critical_gaps": [
+    {
+      "severity": "CRITICAL",
+      "gap": "13 existing components unaccounted for — will break when globals.css is rewritten",
+      "fix": "Add every existing src/components/*.tsx to either (a) deprecation list, (b) modification list with specific changes, or (c) explicit 'KEEP AS-IS' list. Cross-reference imports in page.tsx files to verify no dead references."
+    },
+    {
+      "severity": "CRITICAL",
+      "gap": "Hero diagram animation architecture (inline SVG with GSAP position tweening) incompatible with delivered external split-SVG assets (two standalone 600×600 files)",
+      "fix": "Either: (a) rebuild hero-diagram-before/after as inline React SVG components that GSAP can manipulate, or (b) change animation approach to crossfade between two <img> elements with a different transition mechanic, or (c) deliver a single combined SVG with both groups and GSAP data attributes."
+    },
+    {
+      "severity": "HIGH",
+      "gap": "Plan proposes changes (identity.label) already present in site.ts — data staleness indicates plan written against different codebase state",
+      "fix": "Diff the plan's proposed data model against actual site.ts and remove already-applied changes. Add explicit 'CURRENT STATE → TARGET STATE' comparisons for each field."
+    },
+    {
+      "severity": "HIGH",
+      "gap": "15 assets referenced for product pages don't exist — Phase 6 implementer will encounter broken image references at build time",
+      "fix": "Either generate all missing assets before Phase 6 starts, or add conditional logic (ImageWithFallback + placeholder) in the plan, or stage the product page updates to only reference assets that exist."
+    },
+    {
+      "severity": "HIGH",
+      "gap": "No 'DO NOT TOUCH' list — implementers may accidentally modify vercel.json, next.config, CaseItem type signature, or external URLs",
+      "fix": "Add explicit section listing files/types/values that must be preserved exactly as-is, with rationale."
+    },
+    {
+      "severity": "MEDIUM",
+      "gap": "SectionDivider double-counted as both new file (#31) and modification (#24) — creates ambiguity about whether to move or duplicate",
+      "fix": "Decide: either move existing SectionDivider.tsx to shared/ and list only as modify, or create a new shared variant and deprecate the old one."
+    },
+    {
+      "severity": "MEDIUM",
+      "gap": "Switzer font npm package (@fontsource/switzer) doesn't exist — plan's dependency section is wrong",
+      "fix": "Replace with next/font/local + self-hosted .woff2 files. Document the font file acquisition (ITF license or OFL alternative)."
+    },
+    {
+      "severity": "MEDIUM",
+      "gap": "0brain.image path error — plan says 'already correct' at /assets/screenshots/0brain-dashboard.png, but site.ts actually has /assets/3.jfif",
+      "fix": "Fix the modification entry to correctly state that 0brain.image needs updating, same as codexpilot."
+    }
+  ],
+
+  "comparison_to_phase_4_remediation": {
+    "phase_4_critical_issues": [
+      "Logo (AS-036) violated every spec requirement",
+      "D/A monogram (AS-035) completely missing",
+      "Favicon (AS-037) not redesigned",
+      "No generation manifest"
+    ],
+    "phase_5_plan_status": [
+      "logo.svg HAS BEEN REBUILT — 480×80, Switzer Medium 500, D/A monogram + DORIAN wordmark, no gradients, no 'APPS' ✓",
+      "da-monogram.svg EXISTS — 64×64, currentColor, interlocking D/A, metadata comments ✓",
+      "favicon.svg HAS BEEN REBUILT — da-monogram on #070808 rounded-rect, no gradients ✓",
+      "Asset generation log EXISTS at /root/dorianapps/docs/asset-generation-log.md — partially addresses source traceability concern",
+      "Phase 5 plan correctly references all rebuilt assets"
+    ],
+    "verdict": "Phase 4 critical gaps have been remediated BEFORE this plan was written. The plan correctly reflects the rebuilt asset state."
+  },
+
+  "recommendations": [
+    "ADD all 13 unaccounted components to deprecation/modification lists with specific fate for each (WorkSection, CasePage, ContactSection, ProductShowcase, ProcessSection, ProductScreenPortal, StatCounter, Marquee, HomeHero, FadeIn, RevealText, AccentProvider, ToolkitSection)",
+    "RECONCILE hero diagram animation architecture with actual asset format — either rebuild SVGs as inline React components or change the animation approach",
+    "ADD explicit 'DO NOT MODIFY' section listing: vercel.json, next.config (if exists), CaseItem existing fields, external URLs, ErrorBoundary, ImageWithFallback",
+    "RUN a `git diff` of site.ts vs plan proposals to remove already-applied changes from the modification list",
+    "GENERATE missing screenshots (docvault-query.png, 0brain-memory-trace.png, fenix-plus-sa-preview.png) before Phase 6 or add conditional fallback logic",
+    "FIX 0brain.image path in modification entry — it's currently wrong (says 'already correct' but points to 3.jfif)",
+    "REPLACE @fontsource/switzer with next/font/local + self-hosted file approach with documented font acquisition path",
+    "CLARIFY SectionDivider disposition — one file, one place, one disposition",
+    "ADD CLS/font-swap risk to performance section",
+    "ADD ARIA-live region specification for dynamic content (lab filter, form errors)",
+    "SPECIFY heading hierarchy per page (h1→h2→h3 structure)"
+  ]
+}

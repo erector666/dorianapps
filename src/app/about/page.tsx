@@ -12,8 +12,9 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="site-shell">
+    <>
       <Header />
+      <main id="main-content" className="site-shell">
 
       {/* Hero with portrait */}
       <section className="relative overflow-hidden pt-32">
@@ -143,5 +144,6 @@ export default function AboutPage() {
         </div>
       </section>
     </main>
+    </>
   );
 }

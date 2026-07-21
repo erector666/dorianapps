@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { primaryLinks } from "@/data/navigation";
 
@@ -9,15 +10,16 @@ export function Header() {
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50 bg-[var(--glass-bg)] backdrop-blur-xl">
-      <nav aria-label="Main" className="experience-container flex items-center justify-between border-b border-white/15 px-0 py-4">
+      <nav aria-label="Main" className="container flex items-center justify-between border-b border-white/10 px-0 py-4">
         <Link href="/" className="flex items-center gap-3" aria-label="Dorian Apps home">
-          <span className="font-mono text-sm font-bold tracking-[0.2em] text-white">D/A</span>
-          <span>
-            <span className="block text-xs font-bold uppercase tracking-[0.13em] leading-none">Dorian Apps</span>
-            <span className="block font-mono text-[0.58rem] uppercase tracking-[0.25em] text-[var(--color-muted)]">
-              Nik Velkovski
-            </span>
-          </span>
+          <Image
+            src="/assets/logo.svg"
+            alt="Dorian Apps"
+            width={120}
+            height={20}
+            className="h-5 w-auto"
+            priority
+          />
         </Link>
         <button
           type="button"
@@ -32,15 +34,15 @@ export function Header() {
         </button>
         <div className="hidden items-center gap-7 md:flex">
           {primaryLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="nav-link text-sm font-semibold text-white/76">
+            <Link key={link.href} href={link.href} className="nav-link text-sm font-medium text-white/70 transition-colors hover:text-white">
               {link.label}
             </Link>
           ))}
           <Link
             href="/contact"
-            className="focus-ring border-b border-white px-1 py-2 font-mono text-[0.65rem] font-bold uppercase tracking-[0.22em] text-white"
+            className="focus-ring rounded-full border border-violet-400/40 bg-violet-500/10 px-4 py-2 font-mono text-[0.62rem] font-bold uppercase tracking-[0.18em] text-violet-300 transition-colors hover:bg-violet-500/20 hover:text-white"
           >
-            Start
+            Start a project
           </Link>
         </div>
       </nav>

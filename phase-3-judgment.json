@@ -1,0 +1,158 @@
+{
+  "verdict": "FAIL — 16 issues found (2 CRITICAL, 9 HIGH, 5 MEDIUM). Document is thorough but has verifiable gaps in completeness, internal inconsistency in reuse disposition, a borderline-impossible dimension, ambiguous licensing on 3 assets, and one unaccounted-for existing asset.",
+  "scoring": {
+    "completeness": "HIGH (2 gaps)",
+    "source_method": "MEDIUM (1 unresolved fork, 1 ambiguous TBD-adjacent)",
+    "licensing": "MEDIUM (3 ambiguous dual-license specs)",
+    "mobile_variants": "HIGH (1 missing mobile fallback ID)",
+    "dimensions_realism": "MEDIUM (1 borderline-impossible ratio)",
+    "no_gaps": "MEDIUM (2 assets from prior phases unaccounted)",
+    "reuse_honesty": "MEDIUM (1 inconsistency, 1 misclassified)"
+  },
+  "issues": [
+    {
+      "severity": "CRITICAL",
+      "category": "reuse_honesty",
+      "title": "workshop_still.jpg classified in BOTH 'REUSE WITH REVISION' and 'DEPRECATE' lists",
+      "lines": "Line 382 (AS-017 REUSE WITH REVISION) vs Line 1207 (Deprecated Assets list: 'Evaluate for AS-017. If off-brand, deprecate.')",
+      "detail": "AS-017 says 'REUSE WITH REVISION — evaluate existing workshop_still.jpg' but the Deprecated Assets table at line 1207 also lists workshop_still.jpg with 'Evaluate for AS-017. If off-brand, deprecate.' An asset cannot simultaneously be in the revise pile and the deprecate pile. The disposition is self-contradicting — the document needs to pick one. The ambiguity means a downstream implementer has no clear instruction."
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "no_gaps",
+      "title": "Unaccounted existing asset: '1strong portrait.jfif'",
+      "lines": "No line in Phase 3 (not in reuse table lines 1167-1177, not in revision table lines 1179-1189, not in deprecation table lines 1191-1207)",
+      "detail": "The file /public/assets/1strong portrait.jfif exists in the repository but is completely absent from Phase 3. It is not classified as REUSE, REVISE, or DEPRECATE. This is a pure gap — an asset exists that the specification does not acknowledge. It should be explicitly deprecated (likely a placeholder/legacy portrait) or, if it's a usable Nik portrait, assigned an AS-XXX ID."
+    },
+    {
+      "severity": "HIGH",
+      "category": "dimensions_realism",
+      "title": "AS-021 Method Process Diagram has borderline-impossible 5:1 aspect ratio",
+      "lines": "Line 460: 'Required dimensions: 1000 × 200 viewBox (horizontal timeline)'; Line 461: 'Aspect ratio: 5:1'",
+      "detail": "With 6 stages (Understand → Identify → Design → Build → Verify → Iterate) at 1000px wide, each stage gets ~167px of horizontal space. Each must fit a numbered circle, a stage name ('Understand' is 9 characters), and be connected by ruled lines. At 200px height with numbered circles and text labels below, this is extremely cramped. 'Understand' at a reasonable font size (~12-14px) with a circle above it takes ~40-50px of height minimum, leaving ~150px for the line and spacing. The 5:1 ratio is unrealistically narrow for 6 labeled nodes with connecting lines. Recommend at least 1200×400 (3:1) or a vertical layout alternative."
+    },
+    {
+      "severity": "HIGH",
+      "category": "source_method",
+      "title": "AS-043 Workshop Video has unresolved source fork with no decision logic",
+      "lines": "Line 932: 'Evaluate existing workshop_video_silent.mp4 if it aligns with new direction. If too sci-fi, create new AI-generated video or use static image instead.'",
+      "detail": "This is the closest thing to a TBD in the document. Three possible outcomes (reuse / generate new / use static) with no criteria for choosing, no deadline for evaluation, and no fallback chain specified. A downstream implementer cannot proceed without making a judgment call that should have been made in Phase 3. Compare with AS-009 which at least has a conditional path ('if verified current. If stale, recapture.') — AS-043 is more ambiguous."
+    },
+    {
+      "severity": "HIGH",
+      "category": "no_gaps",
+      "title": "No Apple Touch Icon specified",
+      "lines": "Section 6 (lines 739-800) and Section 7 (lines 803-844)",
+      "detail": "Phase 3 specifies a favicon (AS-037) at 64×64 viewBox with 32×32 PNG fallback. It does NOT specify an Apple Touch Icon (180×180 PNG, typically named apple-touch-icon.png). This is a standard web asset required for iOS home screen bookmarks and is part of virtually every production website's asset manifest. Missing from all sections."
+    },
+    {
+      "severity": "HIGH",
+      "category": "mobile_variants",
+      "title": "AS-053 Hero Scene Poster Frame mobile variant referenced but not assigned an Asset ID",
+      "lines": "Line 1023: 'Mobile variant requirement: Yes — corresponding mobile blur placeholder'",
+      "detail": "AS-053 is the desktop blur placeholder for AS-001 (2560×1440). Line 1023 says it needs a mobile variant but no separate Asset ID is assigned. Compare with hero scenes where AS-001 has AS-045 (mobile variant) and AS-002 has AS-046, etc. The mobile blur placeholder for AS-053 should have its own ID or be explicitly part of AS-053's spec. As written, a downstream implementer has no reference ID for this asset."
+    },
+    {
+      "severity": "HIGH",
+      "category": "licensing",
+      "title": "AS-032 Capability Icons — dual-license ambiguity",
+      "lines": "Line 695: 'Original creation (owned) — or MIT-licensed base icons customized'",
+      "detail": "The 'or' construction creates ambiguity. If Phosphor Icons or Lucide (MIT-licensed) are used as a base, the resulting work carries MIT license obligations (copyright notice, permission notice). If hand-crafted from scratch, it's owned outright. The implementer cannot determine the actual licensing status from this spec. Similar issue on AS-034 (line 735). The specification should commit to one path and document the resulting license."
+
+    },
+    {
+      "severity": "HIGH",
+      "category": "licensing",
+      "title": "AS-034 Social Icons — same dual-license ambiguity",
+      "lines": "Line 735: 'Original creation (owned) — or MIT-licensed'",
+      "detail": "Same 'either/or' licensing pattern as AS-032. Social platform icons (GitHub mark, X logo, LinkedIn mark) may carry additional trademark concerns beyond software licensing. The specification does not address this."
+    },
+    {
+      "severity": "HIGH",
+      "category": "licensing",
+      "title": "AS-012 CodexPilot Secondary Screenshot lacks 'prototype' label mention",
+      "lines": "Line 277: 'Verified screenshot or generated mockup (owned)'",
+      "detail": "AS-011 explicitly says 'mark clearly as \"prototype\" if mockup' (line 256). AS-012 does not include this requirement (line 277). If AS-012 is a mockup, it should carry the same honesty label as AS-011. Inconsistent integrity standard between the two CodexPilot screenshot assets."
+    },
+    {
+      "severity": "HIGH",
+      "category": "no_gaps",
+      "title": "No dedicated hero/header imagery for Work Registry index page (/work)",
+      "lines": "Line 1232: '/work (registry): AS-027–031 (product/work icons per entry), AS-040 (grid texture)'",
+      "detail": "Phase 2 describes the Work page as 'System Registry' — a curated portfolio organized as a system registry (lines 100-101). It's a full page with its own identity. Phase 3 assigns only icons and a grid texture — no header background image, no establishing shot, no diagram. Compare with Capabilities page which at least gets 10 custom capability icons (AS-032). The Work registry page is visually under-specified for a page that Phase 2 calls out as 'the most Bloomberg-influenced page: dense, organized, scannable' (line 101)."
+    },
+    {
+      "severity": "HIGH",
+      "category": "no_gaps",
+      "title": "No dedicated hero/header imagery for Approach page (/approach)",
+      "lines": "Lines 1241-1246: only AS-021 (method diagram) + AS-040 (grid texture)",
+      "detail": "The Approach/Operating Manual page has no background image, no environmental photograph, no establishing hero visual. Phase 2 describes it as a structured, documentation-style page — but a documentation page still benefits from atmospheric imagery. AS-016 (Method Workspace Image, line 347) is assigned to /about not /approach. This may be intentional, but the contrast with the heavily-imaged About page is notable."
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "completeness",
+      "title": "Favicon specification incomplete for production use",
+      "lines": "Line 796: 'SVG (primary) + 32×32 PNG fallback'",
+      "detail": "Production favicons typically require: 16×16, 32×32, 48×48 PNGs, a .ico file for legacy browsers, and an apple-touch-icon at 180×180. AS-037 only specifies 32×32 PNG as fallback. Missing: 16×16 PNG, .ico multi-resolution file, and (per separate issue) apple-touch-icon. The SVG primary is good for modern browsers but the fallback set is incomplete."
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "reuse_honesty",
+      "title": "AS-035 Logo classified as 'CREATE NEW' but existing logo.svg is in 'REUSE WITH REVISION' table",
+      "lines": "Line 758 (AS-035: 'CREATE NEW — redesign of existing logo.svg') vs Line 1188 (revision table: '/assets/logo.svg — Complete redesign. Current: gradient, serif, cyan dot.')",
+      "detail": "A 'complete redesign' from scratch is CREATE NEW, not REUSE WITH REVISION. The existing logo.svg is listed under 'Assets REUSED WITH REVISION' but the revision described is 'Complete redesign.' If nothing from the existing logo survives (no geometry, no colors, no typography, no layout), it shouldn't be in the revision table. It should be in the deprecation table as replaced by AS-035/036."
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "mobile_variants",
+      "title": "Mobile crop dimensions are iPhone 8-era (750×1334), not modern aspect ratios",
+      "lines": "Lines 967-973: all mobile crops at 750 × 1334",
+      "detail": "750×1334 is the iPhone 6/7/8 resolution (16:9 portrait equivalent of 9:16). Modern phones have taller aspect ratios: iPhone 14/15 at 1170×2532 (~19.5:9), most Android flagships at ~20:9. Using 750×1334 as the mobile crop target means images will be letterboxed or need different cropping on modern devices. This may be acceptable (conservative common denominator) but the spec should acknowledge the tradeoff."
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "completeness",
+      "title": "No specification for favicon .ico multi-resolution file",
+      "lines": "Line 796: only SVG + 32×32 PNG",
+      "detail": "Standard for favicon.ico files: they embed 16×16, 32×32, and 48×48 in a single file. AS-037 mentions only 32×32 PNG as fallback. While SVG favicons are well-supported in modern browsers, a .ico fallback is still recommended for IE mode, certain crawlers, and some enterprise environments."
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "completeness",
+      "title": "AS-051 (Hero Diagram mobile) is not a real asset — it's CSS; counted inconsistently",
+      "lines": "Line 973: 'AS-051 — Implemented via CSS — SVG viewBox adapts to vertical layout. No separate file. N/A'",
+      "detail": "AS-051 is listed as one of the 7 mobile crop variants (AS-045 through AS-051) in section 10 but it has no dimensions, no format, no file, and the description column says 'N/A'. This inflates the mobile crop count from 6 real assets to 7. If the total asset count of '73' depends on counting AS-051, the count is overstated. Should be documented as a responsive behavior of AS-018, not a separate asset."
+    }
+  ],
+  "asset_count_audit": {
+    "claimed": 73,
+    "actual_unique_assets": "~69-70 (counting multi-part icon sets as single assets; AS-051 is not a real file asset)",
+    "note": "Exact count depends on whether AS-032 (10 sub-icons), AS-033 (7 sub-icons), and AS-034 (4 sub-icons) are counted as 3 or 21 assets. If counted as 21, total ≈ 88 including AS-051 which is CSS-only. The claimed 73 is in the plausible range but not precisely verifiable from the document structure."
+  },
+  "strengths": [
+    "All 6 photorealistic hero scenes from Phase 1 are fully specified with 13 required fields each",
+    "Product screenshots correctly require verification — 'verified screenshot' not 'fabricated mockup'",
+    "Existing asset disposition table (Section 15) is thorough and covers most files",
+    "Generation priority section (Section 17) provides clear dependency ordering",
+    "File size budget (Section 18) shows realistic ~3.8MB total, well within limits",
+    "Mobile crops are specified for all 6 hero scenes",
+    "404 graphic, preloader, fallback images, and poster frames are all covered",
+    "Motion requirements are specified per asset (static vs scroll-driven vs animated)",
+    "All diagrams follow the Systematic direction's single-accent + monochrome rule",
+    "Deprecation of the 355MB ai-awakening directory is explicit and correct"
+  ],
+  "recommendations": [
+    "Resolve workshop_still.jpg ambiguity: pick REUSE WITH REVISION or DEPRECATE, not both",
+    "Assign disposition for '1strong portrait.jfif' — add to deprecation list or assign AS-XXX",
+    "Add Apple Touch Icon (180×180) as a new asset or note that it's derived from AS-037",
+    "Widen AS-021 Method Diagram from 5:1 to at least 3:1 (e.g., 1200×400) or define vertical alternative",
+    "Resolve AS-043 source fork: commit to a path or define decision criteria",
+    "Add 'prototype' label requirement to AS-012 to match AS-011's integrity standard",
+    "Clarify licensing path for AS-032 and AS-034 — pick one (owned or MIT) and document obligations",
+    "Move existing logo.svg from 'REUSE WITH REVISION' table to 'DEPRECATE' since it's a complete redesign",
+    "Add 16×16 PNG and .ico to AS-037 favicon spec",
+    "Add Work Registry page header imagery or explicitly document why it's intentionally image-free",
+    "Document AS-053 mobile variant with its own Asset ID or note it's folded into the parent",
+    "Define AS-051 as CSS behavior of AS-018, not a separate asset"
+  ]
+}

@@ -52,8 +52,9 @@ export default function ContactPage() {
   }
 
   return (
-    <main className="site-shell">
+    <>
       <Header />
+      <main id="main-content" className="site-shell">
 
       <section className="pt-32">
         <div className="container grid min-h-[calc(100vh-8rem)] gap-10 pb-20 lg:grid-cols-[1fr_1fr] lg:items-start">
@@ -254,18 +255,21 @@ export default function ContactPage() {
               Messages go directly to {identity.founder}. No automation, no
               autoresponder.
             </p>
+            <p className="mt-3 text-center text-sm text-[var(--color-muted)]">
+              Contact form coming soon. Email us at{" "}
+              <a
+                href="mailto:hello@dorianapps.com"
+                className="underline hover:text-[var(--color-text)] transition-colors"
+              >
+                hello@dorianapps.com
+              </a>{" "}
+              in the meantime.
+            </p>
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-white/10 py-6">
-        <div className="container flex flex-col justify-between gap-3 font-mono text-xs uppercase tracking-[0.18em] text-white/52 md:flex-row">
-          <span>{identity.company} / AI products and operational software</span>
-          <span>
-            {identity.founder} / {identity.location}
-          </span>
-        </div>
-      </footer>
     </main>
+    </>
   );
 }

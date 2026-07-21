@@ -146,7 +146,7 @@ export function AIAwakeningHero() {
         </div>
 
         {/* Copy with AnimatePresence */}
-        <div className="flow-container rx-hero-content">
+        <div className="container rx-hero-content">
           <div className="rx-hero-copy">
             <AnimatePresence mode="wait">
               <motion.div
@@ -158,7 +158,7 @@ export function AIAwakeningHero() {
                 transition={reducedMotion ? { duration: 0 } : { type: "spring" as const, stiffness: 400, damping: 35 }}
               >
                 <motion.p
-                  className="flow-kicker"
+                  className="font-mono text-[0.6rem] font-bold uppercase tracking-[0.2em] mb-4"
                   style={{ color: "#ff4444" }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -191,7 +191,7 @@ export function AIAwakeningHero() {
           </div>
 
           {/* Telemetry */}
-          <div className="flow-telemetry rx-hero-telemetry" aria-hidden="true">
+          <div className="rx-hero-telemetry" style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", fontFamily: "monospace", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em" }} aria-hidden="true">
             {STAGES.map((s, i) => (
               <motion.span
                 key={s.telemetry}
@@ -208,7 +208,7 @@ export function AIAwakeningHero() {
 
           {/* Progress bar */}
           <div className="rx-hero-cue" aria-hidden="true">
-            <p className="flow-scroll-cue rx-hero-cue-label" style={{ color: "#ff4444" }}>
+            <p className="rx-hero-cue-label" style={{ fontFamily: "monospace", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.2em", color: "#ff4444" }}>
               SCROLL / {current.tag}
             </p>
             <div className="rx-hero-progress">

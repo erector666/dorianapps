@@ -1,38 +1,48 @@
+import Link from "next/link";
 import { identity } from "@/data/site";
+import { primaryLinks } from "@/data/navigation";
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/15 px-0 py-10" role="contentinfo">
-      <div className="experience-container flex flex-col gap-6 sm:flex-row sm:justify-between sm:items-start">
-        {/* Wordmark */}
-        <div className="flex flex-col gap-1">
-          <span className="font-display text-lg font-bold tracking-[-0.01em] text-text">
-            DORIAN APPS
-          </span>
-          <span className="font-body text-sm text-muted">
-            AI-native software studio
-          </span>
+    <footer className="border-t border-white/10 py-14" role="contentinfo">
+      <div className="container">
+        <div className="grid gap-10 sm:grid-cols-[1fr_auto] sm:items-start">
+          {/* Wordmark */}
+          <div className="flex flex-col gap-2">
+            <span className="font-display text-lg font-bold tracking-[-0.01em] text-text">
+              DORIAN APPS
+            </span>
+            <span className="text-sm text-muted max-w-[22ch]">
+              Software for work that has outgrown spreadsheets
+            </span>
+          </div>
+
+          {/* Nav links */}
+          <nav aria-label="Footer" className="flex flex-wrap gap-6 sm:gap-8">
+            {primaryLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="font-mono text-xs tracking-[0.12em] uppercase text-muted transition-colors hover:text-text"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
         </div>
 
-        {/* Location + Contact */}
-        <div className="flex flex-col gap-3 text-right">
-          <p className="m-0 font-mono text-xs tracking-[0.14em] uppercase text-muted">
-            {identity.location}
+        {/* Bottom bar */}
+        <div className="mt-10 pt-5 border-t border-white/10 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+          <p className="m-0 font-mono text-[0.58rem] tracking-[0.12em] uppercase text-muted">
+            © {new Date().getFullYear()} Dorian Apps — {identity.location}
           </p>
-          <a
+          <Link
             href="/contact"
-            className="inline-flex justify-end font-mono text-xs font-semibold tracking-[0.14em] uppercase text-text border-b border-white/20 pb-0.5 hover:border-white/60 transition-colors"
+            className="inline-flex items-center gap-2 font-mono text-xs font-semibold tracking-[0.12em] uppercase text-text border-b border-white/20 pb-0.5 hover:border-accent transition-colors"
           >
-            Start a project
-          </a>
+            Start a project <span aria-hidden="true">↗</span>
+          </Link>
         </div>
-      </div>
-
-      {/* Copyright */}
-      <div className="experience-container mt-8 pt-4 border-t border-white/10">
-        <p className="m-0 font-mono text-[0.58rem] tracking-[0.12em] uppercase text-muted">
-          © {new Date().getFullYear()} Dorian Apps. All rights reserved.
-        </p>
       </div>
     </footer>
   );

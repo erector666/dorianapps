@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function FenixPlusSaPage() {
   return (
-    <main className="site-shell">
+    <main id="main-content" className="site-shell">
       <Header />
 
       {/* Hero */}

@@ -36,7 +36,7 @@ const useCases = [
 
 export default function FenixConstructionTrackerPage() {
   return (
-    <main className="site-shell">
+    <main id="main-content" className="site-shell">
       <Header />
       {/* Hero */}
       <section className="relative overflow-hidden pt-32">

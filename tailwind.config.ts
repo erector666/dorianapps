@@ -9,18 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Semantically mapped CSS variable tokens
         bg:      "var(--color-bg)",
         surface: "var(--color-surface)",
         border:  "var(--color-border)",
         text:    "var(--color-text)",
         muted:   "var(--color-muted)",
         accent:  "var(--color-accent)",
-        // Surface palette (3-step depth)
-        "neutral-950": "var(--surface-base)",
-        "neutral-900": "var(--surface-elevated)",
-        "neutral-850": "var(--surface-floating)",
-        // Accent hues
+        "surface-base":     "var(--surface-base)",
+        "surface-elevated": "var(--surface-elevated)",
+        "surface-alt":      "var(--surface-alt)",
+        "surface-floating": "var(--surface-floating)",
+        "surface-glass":     "var(--surface-glass)",
         "amber":   "var(--accent-amber)",
         "cyan":    "var(--accent-cyan)",
         "green":   "var(--accent-green)",
@@ -33,8 +32,8 @@ const config: Config = {
         mono:    ["var(--font-mono)"]
       },
       fontSize: {
-        hero:    ["var(--fs-hero)",    { lineHeight: "0.91", fontWeight: "500", letterSpacing: "-0.02em" }],
-        section: ["var(--fs-section)", { lineHeight: "0.93", fontWeight: "400", letterSpacing: "-0.01em" }],
+        hero:    ["var(--fs-hero)",    { lineHeight: "0.93", fontWeight: "500", letterSpacing: "-0.02em" }],
+        section: ["var(--fs-section)", { lineHeight: "0.95", fontWeight: "400", letterSpacing: "-0.01em" }],
       },
       transitionTimingFunction: {
         "out-expo":   "var(--ease-out-expo)",

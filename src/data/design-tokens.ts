@@ -1,4 +1,4 @@
-// Design tokens — centralized constants for the Dorian Apps redesign.
+// Design tokens — Systematic palette (Phase 2).
 // Consumed by Tailwind config, CSS custom properties, and programmatic color usage.
 
 export const accentColors = {
@@ -20,22 +20,34 @@ export const productAccents = {
 export type AccentKey = keyof typeof accentColors;
 export type AccentColor = typeof accentColors[AccentKey];
 
+// Systematic surface palette (Phase 2)
 export const surfacePalette = {
-  base:     "#070808",
-  elevated: "#0E0F10",
-  floating: "#141518",
-  alt:      "#111215",
+  base:     "#08090A",
+  elevated: "#111215",
+  alt:      "#0E1014",
+  floating: "#181A1E",
+  glass:    "rgba(8,9,10,0.72)",
 } as const;
 
+// Systematic text palette
 export const textColors = {
-  body:   "#F5F5F7",
-  muted:  "#8A8F98",
-  inverse: "#070808",
+  body:    "#EAEAEC",
+  muted:   "#858993",
+  inverse: "#08090A",
+  disabled: "#52555C",
+} as const;
+
+export const borderColors = {
+  subtle:  "rgba(255,255,255,0.08)",
+  default: "rgba(255,255,255,0.12)",
+  strong:  "rgba(255,255,255,0.18)",
+  focus:   "rgba(255,255,255,0.32)",
 } as const;
 
 export const glass = {
-  bg: "rgba(7,8,8,0.70)",
+  bg: "rgba(8,9,10,0.72)",
   blur: "20px",
+  saturate: "140%",
 } as const;
 
 export const typography = {
@@ -43,11 +55,13 @@ export const typography = {
     size: "clamp(2.5rem, 8vw, 6rem)",
     weight: "500",
     tracking: "-0.02em",
+    lineHeight: "0.93",
   },
   section: {
     size: "clamp(2rem, 5vw, 4rem)",
     weight: "400",
     tracking: "-0.01em",
+    lineHeight: "0.95",
   },
   cardTitle: {
     size: "1.25rem",
@@ -68,6 +82,11 @@ export const typography = {
     size: "0.75rem",
     weight: "400",
     tracking: "0.02em",
+  },
+  eyebrow: {
+    size: "0.72rem",
+    weight: "600",
+    tracking: "0.18em",
   },
 } as const;
 
@@ -108,4 +127,12 @@ export const motion = {
     outExpo: [0.16, 1, 0.3, 1] as [number, number, number, number],
     inOut:   [0.4, 0, 0.2, 1] as [number, number, number, number],
   },
+} as const;
+
+// Spacing tokens (for systematic rhythm)
+export const spacing = {
+  section:  "clamp(5rem, 10vw, 9rem)",
+  component: "clamp(2rem, 4vw, 4rem)",
+  element:   "clamp(1rem, 2vw, 2rem)",
+  inline:    "clamp(0.5rem, 1vw, 1rem)",
 } as const;
